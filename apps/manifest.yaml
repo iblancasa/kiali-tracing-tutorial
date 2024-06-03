@@ -1,0 +1,168 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: demo
+  labels:
+    istio-injection: enabled
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: app1
+  namespace: demo
+  labels:
+    app: app1
+    service: app1
+spec:
+  ports:
+  - port: 9080
+    name: http
+  selector:
+    app: app1
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: demo-app1
+  namespace: demo
+  labels:
+    account: app1
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app1-v1
+  namespace: demo
+  labels:
+    app: app1
+    version: v1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: app1
+      version: v1
+  template:
+    metadata:
+      annotations:
+        instrumentation.opentelemetry.io/inject-python: "true"
+      labels:
+        app: app1
+        version: v1
+    spec:
+      serviceAccountName: demo-app1
+      containers:
+      - name: app1
+        image: ttl.sh/iblancasa/demo-app1
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 9080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: app2
+  namespace: demo
+  labels:
+    app: app2
+    service: app2
+spec:
+  ports:
+  - port: 9080
+    name: http
+  selector:
+    app: app2
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: demo-app2
+  namespace: demo
+  labels:
+    account: app2
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app2-v1
+  namespace: demo
+  labels:
+    app: app2
+    version: v1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: app2
+      version: v1
+  template:
+    metadata:
+      annotations:
+        instrumentation.opentelemetry.io/inject-python: "true"
+      labels:
+        app: app2
+        version: v1
+    spec:
+      serviceAccountName: demo-app2
+      containers:
+      - name: app2
+        image: ttl.sh/iblancasa/demo-app2
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 9080
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: demo-gateway
+  namespace: demo
+spec:
+  selector:
+    istio: ingressgateway
+  servers:
+  - port:
+      number: 80
+      name: http
+      protocol: HTTP
+    hosts:
+    - "*"
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: demo
+  namespace: demo
+spec:
+  hosts:
+  - "*"
+  gateways:
+  - demo-gateway
+  http:
+  - match:
+    - uri:
+        exact: /no-header-forwarding
+    route:
+    - destination:
+        host: app1
+        port:
+          number: 9080
+  - match:
+    - uri:
+        exact: /header-forwarding
+    route:
+    - destination:
+        host: app1
+        port:
+          number: 9080
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: app1
+  namespace: demo
+spec:
+  host: app1
+  subsets:
+  - name: v1
+    labels:
+      version: v1

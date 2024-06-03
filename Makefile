@@ -5,11 +5,14 @@ LOCALBIN ?= $(shell pwd)/bin
 CERTMANAGER_VERSION ?= 1.10.0
 CMCTL = $(LOCALBIN)/cmctl
 OPENTELEMETRY_OPERATOR_VERSION ?= 0.101.0
-TEMPO_OPERATOR_VERSION ?= 0.10.0
-PROMETHEUS_OPERATOR_VERSION ?= 0.74.0
+JAEGER_OPERATOR_VERSION ?= 1.57.0
 
 ISTIOCTL ?= $(LOCALBIN)/istioctl
-ISTIO_VERSION ?= "1.15.0"
+ISTIO_VERSION ?= "1.22.0"
+
+# Applications
+APP_IMG ?= ttl.sh/iblancasa/demo-app1
+APP2_IMG ?= ttl.sh/iblancasa/demo-app2
 
 
 help: ## Show help message
@@ -19,6 +22,7 @@ help: ## Show help message
 .PHONY: start-cluster
 start-cluster: ## Start kind cluster
 	kind create cluster --name=workshop --config=kind.yaml
+	kubectl create -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.0.1/deploy/static/provider/kind/deploy.yaml
 
 .PHONY: clean
 clean: ## Clean all the resources
@@ -28,10 +32,11 @@ clean: ## Clean all the resources
 
 .PHONY: dependencies
 dependencies: ## Deploy all the dependencies in the cluster
-dependencies: cert-manager opentelemetry-operator tempo-operator istio kiali-operator prometheus-operator
+dependencies: cert-manager opentelemetry-operator jaeger-operator kiali-operator
 
 .PHONY: cert-manager
 cert-manager: ## Deploy cert-manager
+	mkdir -p $(LOCALBIN)
 	@{ \
 	set -e ;\
 	if (`pwd`/bin/cmctl version | grep ${CERTMANAGER_VERSION}) > /dev/null 2>&1 ; then \
@@ -51,23 +56,40 @@ cert-manager: ## Deploy cert-manager
 opentelemetry-operator: ## Deploy the OpenTelemetry operator
 	kubectl apply -f https://github.com/open-telemetry/opentelemetry-operator/releases/download/v$(OPENTELEMETRY_OPERATOR_VERSION)/opentelemetry-operator.yaml
 
-.PHONY: tempo-operator
-tempo-operator: ## Deploy the Tempo operator
-	kubectl apply -f https://github.com/grafana/tempo-operator/releases/download/v$(TEMPO_OPERATOR_VERSION)/tempo-operator.yaml
+.PHONY: jaeger-operator
+jaeger-operator: ## Deploy the Jaeger operator
+	kubectl create namespace observability
+	kubectl apply -f https://github.com/jaegertracing/jaeger-operator/releases/download/v$(JAEGER_OPERATOR_VERSION)/jaeger-operator.yaml
+
+.PHONY: infra
+infra: ## Deploy the needed infrastructure
+infra: istio
+	kubectl apply -f https://raw.githubusercontent.com/istio/istio/release-1.22/samples/addons/prometheus.yaml
+	kubectl apply -f infra/jaeger.yaml
+	kubectl apply -f infra/kiali.yaml
 
 .PHONY: istio
 istio: ## Deploy istio
+	mkdir -p $(LOCALBIN)
 	curl -sLo $(LOCALBIN)/downloadIstio https://istio.io/downloadIstio
 	chmod +x $(LOCALBIN)/downloadIstio
 	ISTIO_VERSION=$(ISTIO_VERSION) $(LOCALBIN)/downloadIstio
+	rm -rf $(LOCALBIN)/istio-$(ISTIO_VERSION)
 	mv istio-$(ISTIO_VERSION) $(LOCALBIN)
-	$(LOCALBIN)/istio-$(ISTIO_VERSION)/bin/istioctl install --set profile=minimal -y
+	$(LOCALBIN)/istio-$(ISTIO_VERSION)/bin/istioctl install --set profile=demo -y --set meshConfig.defaultConfig.tracing.zipkin.address=jaeger-collector.istio-system.svc.cluster.local:9411 --set "components.egressGateways[0].name=istio-egressgateway" --set "components.egressGateways[0].enabled=true"
 
 .PHONY: kiali-operator
 kiali-operator: ## Deploy the Kiali operator
 	helm repo add kiali https://kiali.org/helm-charts
 	helm install --namespace kiali-operator --create-namespace kiali-operator kiali/kiali-operator
 
-.PHONY: prometheus-operator
-prometheus-operator: ## Deploy the Prometheus operator
-	kubectl create -f https://github.com/prometheus-operator/prometheus-operator/releases/download/v$(PROMETHEUS_OPERATOR_VERSION)/bundle.yaml
+.PHONY: apps
+apps:  ## Build and push the demo applications images
+	cd apps && docker build -t $(APP_IMG) app
+	docker push $(APP_IMG)
+	cd apps && docker build -t $(APP2_IMG) app2
+	docker push $(APP2_IMG)
+
+.PHONY: deploy-apps
+deploy-apps:  ## Deploy the demo applications in the local cluster
+	kubectl apply -f apps/manifest.yaml
