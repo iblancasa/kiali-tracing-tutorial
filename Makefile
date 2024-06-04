@@ -19,6 +19,7 @@ help: ## Show help message
 	@printf "Kiali and distributed tracing tutorial\n"
 	@awk 'BEGIN {FS = ":.*##"; printf "\nUsage:\n"} /^[$$()% a-zA-Z_-]+:.*?##/ { printf "  %-15s \t\t%s\n", $$1, $$2 } /^##@/ { printf "\n%s\n", substr($$0, 5) } ' $(MAKEFILE_LIST)
 
+################## Cluster management ###########################################################################################
 .PHONY: start-cluster
 start-cluster: ## Start kind cluster
 	kind create cluster --name=workshop --config=kind.yaml
@@ -29,7 +30,7 @@ clean: ## Clean all the resources
 	kind delete cluster --name=workshop
 	rm -rf $(LOCALBIN)
 
-
+################## Install dependencies #########################################################################################
 .PHONY: dependencies
 dependencies: ## Deploy all the dependencies in the cluster
 dependencies: cert-manager opentelemetry-operator jaeger-operator kiali-operator
@@ -58,9 +59,10 @@ opentelemetry-operator: ## Deploy the OpenTelemetry operator
 
 .PHONY: jaeger-operator
 jaeger-operator: ## Deploy the Jaeger operator
-	kubectl create namespace observability
+	kubectl create namespace observability 2>&1 | grep -v "already exists" || true
 	kubectl apply -f https://github.com/jaegertracing/jaeger-operator/releases/download/v$(JAEGER_OPERATOR_VERSION)/jaeger-operator.yaml
 
+################## Infrastructure management ####################################################################################
 .PHONY: infra
 infra: ## Deploy the needed infrastructure
 infra: istio
@@ -76,13 +78,14 @@ istio: ## Deploy istio
 	ISTIO_VERSION=$(ISTIO_VERSION) $(LOCALBIN)/downloadIstio
 	rm -rf $(LOCALBIN)/istio-$(ISTIO_VERSION)
 	mv istio-$(ISTIO_VERSION) $(LOCALBIN)
-	$(LOCALBIN)/istio-$(ISTIO_VERSION)/bin/istioctl install --set profile=demo -y --set meshConfig.defaultConfig.tracing.zipkin.address=jaeger-collector.istio-system.svc.cluster.local:9411 --set "components.egressGateways[0].name=istio-egressgateway" --set "components.egressGateways[0].enabled=true"
+	$(LOCALBIN)/istio-$(ISTIO_VERSION)/bin/istioctl install --set profile=demo -y --set meshConfig.defaultConfig.tracing.zipkin.address=instance-collector.istio-system.svc.cluster.local:9411 --set "components.egressGateways[0].name=istio-egressgateway" --set "components.egressGateways[0].enabled=true"
 
 .PHONY: kiali-operator
 kiali-operator: ## Deploy the Kiali operator
 	helm repo add kiali https://kiali.org/helm-charts
 	helm install --namespace kiali-operator --create-namespace kiali-operator kiali/kiali-operator
 
+################## Application management #######################################################################################
 .PHONY: apps
 apps:  ## Build and push the demo applications images
 	cd apps && docker build -t $(APP_IMG) app
