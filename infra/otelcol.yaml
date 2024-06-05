@@ -1,0 +1,28 @@
+apiVersion: opentelemetry.io/v1alpha1
+kind: OpenTelemetryCollector
+metadata:
+  name: instance
+  namespace: istio-system
+spec:
+  config: |
+    receivers:
+      zipkin:
+      otlp:
+        protocols:
+          grpc:
+          http:
+    processors:
+
+    exporters:
+      debug:
+      otlp:
+        endpoint: jaeger-collector:4317
+        tls:
+          insecure: true
+
+    service:
+      pipelines:
+        traces:
+          receivers: [zipkin,otlp]
+          processors: []
+          exporters: [debug, otlp]

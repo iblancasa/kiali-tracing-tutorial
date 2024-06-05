@@ -85,7 +85,7 @@ The Jaeger operator will have create an Ingress to the Jaeger instance in your c
 
 If you refresh the webpage (`F5`) the `Service` dropdown will be populated by `jaeger-all-in-one`. Jaeger itself is instrumented for traces. Each time you query Jaeger or access the UI, new traces will be generated.
 
-## Kiali
+### Kiali
 
 [Kiali](https://kiali.io/) is an open-source observability console for Istio service mesh, providing a visual interface to manage and monitor microservices within the mesh. It offers detailed insights into the structure, health, and performance of the microservices, allowing users to visualize service interactions, traffic flow, and dependencies. Kiali integrates with other observability tools like Jaeger for tracing and Prometheus for metrics, enabling comprehensive monitoring and debugging capabilities. It also provides features for validating Istio configurations, identifying potential issues, and facilitating the efficient operation and troubleshooting of microservices in a service mesh environment.
 
@@ -114,3 +114,9 @@ $ kubectl port-forward svc/kiali 20001 -n istio-system
 And access [http://localhost:20001/](http://localhost:20001/).
 
 ![Kiali UI](img/00-kiali.png)
+
+
+## Our setup
+After deploying all the components, need to visualize the data flow:
+
+![Telemetry data flow](./img/01-setup.jpg)
