@@ -153,4 +153,4 @@ You can [check the rest of the Kiali features in the official documentation](htt
 When we check the traces for the ingress gateway from the Jaeger UI, we will see something similar to this:
 ![Jaeger UI](./img/02-jaeger.png)
 
-As you can notice, the trace is not complete. Why? We can see spans related to the ingress gateway and the application 1. Where are the spans for services 2 and 3?
+As you can notice, the trace is not complete. Why? We can see spans related to the ingress gateway and the application 1. Where are the spans for services 2 and 3? If you check for traces related to the service 2, you will see that there are spans connecting 1 and 2 and others connecting 2 and 3. But nothing about connecting the ingress gateway, the service 1, service 2 and service 3.

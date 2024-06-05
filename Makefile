@@ -68,6 +68,7 @@ jaeger-operator: ## Deploy the Jaeger operator
 infra: ## Deploy the needed infrastructure
 infra: istio
 	kubectl apply -f https://raw.githubusercontent.com/istio/istio/release-1.22/samples/addons/prometheus.yaml
+	kubectl apply -f infra/otelcol.yaml
 	kubectl apply -f infra/jaeger.yaml
 	kubectl apply -f infra/kiali.yaml
 

@@ -48,6 +48,21 @@ service/prometheus created
 deployment.apps/prometheus created
 ```
 
+### OpenTelemetry Collector
+The [OpenTelemetry Collector](https://opentelemetry.io/docs/collector/) is a versatile and highly configurable component within the OpenTelemetry project, designed to receive, process, and export telemetry data such as traces, metrics, and logs. It provides a unified way to handle telemetry data, which can originate from a variety of sources and be sent to multiple destinations.
+
+```sh
+$ kubectl apply -f infra/otelcol.yaml
+opentelemetrycollector.opentelemetry.io/instance created
+```
+
+To verify the `OpenTelemetryCollector` was deployed properly, you can run the following command:
+```sh
+$ kubectl get otelcol -n istio-system
+NAME       MODE         VERSION   READY   AGE     IMAGE                                                                                     MANAGEMENT
+instance   deployment   0.101.0   1/1     5m20s   ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector:0.101.0   managed
+```
+
 ### Jaeger
 [Jaeger](https://www.jaegertracing.io/docs/1.57/) is an open-source, end-to-end distributed tracing system used for monitoring and troubleshooting microservices-based applications. It helps track the flow of requests through various services, providing insights into service latencies, root causes of performance issues, and service dependencies. Developed initially by Uber Technologies and now part of the Cloud Native Computing Foundation (CNCF), Jaeger supports various features such as context propagation, distributed context management, and spans and traces collection. It integrates with a wide range of tools and platforms, facilitating the visualization of request flows and pinpointing issues within complex microservice architectures, ultimately enhancing the observability and reliability of distributed systems​​​​.
 

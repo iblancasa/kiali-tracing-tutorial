@@ -90,7 +90,7 @@ In this steps we will install some components operators and tools needed for the
 You can install it with `make cert-manager`. The installation will verify itself.
 
 ### OpenTelemetry Operator for Kubernetes
-The [OpenTelemetry Operator](https://github.com/open-telemetry/opentelemetry-operator) will be used to deploy `Instrumentation` instances.
+The [OpenTelemetry Operator](https://github.com/open-telemetry/opentelemetry-operator) will be used to deploy `OpenTelemetryCollector` and `Instrumentation` instances.
 
 You can install it with `make opentelemetry-operator`.
 
