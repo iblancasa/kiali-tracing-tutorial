@@ -11,9 +11,9 @@ ISTIOCTL ?= $(LOCALBIN)/istioctl
 ISTIO_VERSION ?= "1.22.0"
 
 # Applications
-APP_IMG ?= ttl.sh/iblancasa/demo-app1
-APP2_IMG ?= ttl.sh/iblancasa/demo-app2
-APP3_IMG ?= ttl.sh/iblancasa/demo-app3
+APP_IMG ?= quay.io/iblancas/devconf-demo-app-1
+APP2_IMG ?= quay.io/iblancas/devconf-demo-app-2
+APP3_IMG ?= quay.io/iblancas/devconf-demo-app-3
 
 
 help: ## Show help message
@@ -100,3 +100,9 @@ apps:  ## Build and push the demo applications images
 .PHONY: deploy-apps
 deploy-apps:  ## Deploy the demo applications in the local cluster
 	kubectl apply -f apps/manifest.yaml
+
+.PHONY: restart-apps
+restart-apps: ## Restart the deployments
+	kubectl rollout restart deployment app1-v1 -n demo
+	kubectl rollout restart deployment app2-v1 -n demo
+	kubectl rollout restart deployment app3-v1 -n demo

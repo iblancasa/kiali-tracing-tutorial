@@ -49,3 +49,5 @@ If we check the `header-forwarding` endpoint, the implementation is the same as 
 The propagate headers are described in the [B3-multi](https://github.com/openzipkin/b3-propagation) specification. Also, the `x-request-id` header is used by Envoy to uniquely identify a request. More information in the [envoy documentation](https://www.envoyproxy.io/docs/envoy/latest/intro/arch_overview/observability/tracing).
 
 When those headers are propagated, the context propagation works as expected. Now we can observe our system from end to end!
+
+In this case, we have a pretty basic application (just for the demo) but... what would it happen if we have 100 microservices? Maybe it is not a good idea to modify all the endpoints just to have tracing. Would it be a better way of doing this?
