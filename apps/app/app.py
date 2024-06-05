@@ -26,7 +26,7 @@ def context_get_headers(headers):
 def no_forwarding():
     # Simulate some work
     sleep(0.1)
-    response = requests.get('http://app2:9080')
+    response = requests.get('http://app2:9080/no-header-forwarding')
     # Simulate some work
     sleep(0.1)
     return flask.Response(response.text)
@@ -37,7 +37,7 @@ def forwarding():
     headers = context_get_headers(dict(flask.request.headers))
     # Simulate some work
     sleep(0.1)
-    response = requests.get('http://app2:9080', headers=headers)
+    response = requests.get('http://app2:9080/header-forwarding', headers=headers)
     # Simulate some work
     sleep(0.1)
     return flask.Response(response.text)

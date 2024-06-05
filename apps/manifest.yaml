@@ -45,7 +45,7 @@ spec:
   template:
     metadata:
       annotations:
-        instrumentation.opentelemetry.io/inject-python: "true"
+        # instrumentation.opentelemetry.io/inject-python: "true"
       labels:
         app: app1
         version: v1
@@ -98,7 +98,7 @@ spec:
   template:
     metadata:
       annotations:
-        instrumentation.opentelemetry.io/inject-python: "true"
+        # instrumentation.opentelemetry.io/inject-python: "true"
       labels:
         app: app2
         version: v1
@@ -107,6 +107,59 @@ spec:
       containers:
       - name: app2
         image: ttl.sh/iblancasa/demo-app2
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 9080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: app3
+  namespace: demo
+  labels:
+    app: app3
+    service: app3
+spec:
+  ports:
+  - port: 9080
+    name: http
+  selector:
+    app: app3
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: demo-app3
+  namespace: demo
+  labels:
+    account: app3
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app3-v1
+  namespace: demo
+  labels:
+    app: app3
+    version: v1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: app3
+      version: v1
+  template:
+    metadata:
+      annotations:
+        # instrumentation.opentelemetry.io/inject-python: "true"
+      labels:
+        app: app3
+        version: v1
+    spec:
+      serviceAccountName: demo-app3
+      containers:
+      - name: app3
+        image: ttl.sh/iblancasa/demo-app3
         imagePullPolicy: Always
         ports:
         - containerPort: 9080

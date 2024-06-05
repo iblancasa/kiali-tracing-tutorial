@@ -8,9 +8,20 @@ TL;DR: run `make infra`.
 
 ### Istio
 
+[Istio](https://istio.io/) is a comprehensive service mesh that provides a suite of powerful features to manage, secure, and observe microservices. One of its core functionalities is traffic management, which includes sophisticated routing capabilities to control API calls and traffic flows between services. This allows for load balancing, traffic splitting for blue-green deployments or canary releases, and resilience features like retries, timeouts, and circuit breakers.
+
+In terms of security, Istio enhances service-to-service communication by implementing mutual TLS (mTLS) for authentication and encryption, ensuring that data in transit is protected. Additionally, Istio enforces fine-grained authorization policies to control access to services, enhancing the overall security posture of the microservices architecture.
+
+For observability, Istio collects metrics and logs out-of-the-box, integrating with systems like Prometheus for metrics collection and Jaeger or Zipkin for distributed tracing. This enables detailed insights into service behavior and performance, facilitating effective monitoring and troubleshooting. Centralized logging further aids in debugging by aggregating logs from all services in the mesh.
+
+Policy enforcement in Istio allows for rate limiting to prevent abuse, setting quotas to manage resource usage, and applying access policies to control service interactions. Istio's extensibility features enable the integration of custom policies and telemetry using WebAssembly (Wasm) plugins, as well as extending the service mesh with third-party tools.
+
+Istio also provides dynamic service discovery, automatically detecting services and endpoints, which simplifies management and scaling. The centralized configuration management capability allows administrators to manage traffic routing, policies, and telemetry from a single control plane, streamlining operations and reducing complexity.
+
+Overall, Istio's feature set makes it an essential tool for managing modern microservices architectures, offering robust solutions for traffic management, security, observability, policy enforcement, extensibility, service discovery, and configuration management. These features collectively enhance the reliability, security, and performance of applications running in distributed environments​ (GitHub)​​ (GitHub)​.
+
 First, we will deploy the service mesh.
 
-[Istio](https://istio.io/) is an open-source service mesh that provides a way to control how microservices share data with one another. It offers a range of features designed to facilitate the management of microservices, including traffic management, security, observability, and policy enforcement.
 
 You can install it with `make istio`.
 
@@ -38,6 +49,7 @@ deployment.apps/prometheus created
 ```
 
 ### Jaeger
+[Jaeger](https://www.jaegertracing.io/docs/1.57/) is an open-source, end-to-end distributed tracing system used for monitoring and troubleshooting microservices-based applications. It helps track the flow of requests through various services, providing insights into service latencies, root causes of performance issues, and service dependencies. Developed initially by Uber Technologies and now part of the Cloud Native Computing Foundation (CNCF), Jaeger supports various features such as context propagation, distributed context management, and spans and traces collection. It integrates with a wide range of tools and platforms, facilitating the visualization of request flows and pinpointing issues within complex microservice architectures, ultimately enhancing the observability and reliability of distributed systems​​​​.
 
 For this tutorial we will deploy a Jaeger instance that will store all the traces in memory. This deployment mode is called "all in one" and is good for testing or demo purposes.
 ```sh
@@ -60,8 +72,12 @@ If you refresh the webpage (`F5`) the `Service` dropdown will be populated by `j
 
 ## Kiali
 
+[Kiali](https://kiali.io/) is an open-source observability console for Istio service mesh, providing a visual interface to manage and monitor microservices within the mesh. It offers detailed insights into the structure, health, and performance of the microservices, allowing users to visualize service interactions, traffic flow, and dependencies. Kiali integrates with other observability tools like Jaeger for tracing and Prometheus for metrics, enabling comprehensive monitoring and debugging capabilities. It also provides features for validating Istio configurations, identifying potential issues, and facilitating the efficient operation and troubleshooting of microservices in a service mesh environment.
+
 > [!WARNING]  
-> Note we're not using the [Kiali addon](https://istio.io/latest/docs/ops/integrations/kiali/) for Istio because tracing is disabled in this integration. You can deploy your Kiali instance with this command:
+> Note we're not using the [Kiali addon](https://istio.io/latest/docs/ops/integrations/kiali/) for Istio because tracing is disabled in this integration.
+
+You can deploy your Kiali instance with this command:
 
 ```sh
 $ kubectl apply -f infra/kiali.yaml

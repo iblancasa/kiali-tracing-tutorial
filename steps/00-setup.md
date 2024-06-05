@@ -82,13 +82,15 @@ You can remove the cluster using `make clean`.
 
 TL;DR: run `make dependencies`.
 
+In this steps we will install some components operators and tools needed for the tutorial. We will learn more about the deployed elements in the [next section](./01-infrastructure.md).
+
 ### cert-manager
 [cert-manager](https://cert-manager.io/docs/) is used by OpenTelemetry operator to provision TLS certificates for admission webhooks.
 
 You can install it with `make cert-manager`. The installation will verify itself.
 
 ### OpenTelemetry Operator for Kubernetes
-The [OpenTelemetry Operator](https://github.com/open-telemetry/opentelemetry-operator) will be used to deploy `OpenTelemetryCollector` and `Instrumentation` instances.
+The [OpenTelemetry Operator](https://github.com/open-telemetry/opentelemetry-operator) will be used to deploy `Instrumentation` instances.
 
 You can install it with `make opentelemetry-operator`.
 
@@ -100,7 +102,7 @@ opentelemetry-operator-controller-manager-84fcb9457d-t8mhk   2/2     Running   0
 ```
 
 ## Jaeger Operator for Kubernetes
-[Jaeger](https://www.jaegertracing.io/docs/1.57/operator/) is an open-source, end-to-end distributed tracing system used for monitoring and troubleshooting microservices-based applications. It helps track the flow of requests through various services, providing insights into service latencies, root causes of performance issues, and service dependencies. Developed initially by Uber Technologies and now part of the Cloud Native Computing Foundation (CNCF), Jaeger supports various features such as context propagation, distributed context management, and spans and traces collection. It integrates with a wide range of tools and platforms, facilitating the visualization of request flows and pinpointing issues within complex microservice architectures, ultimately enhancing the observability and reliability of distributed systems​​​​. We will use the Jaeger operator to deploy Jaeger instances.
+We will use the [Jaeger operator](https://www.jaegertracing.io/docs/1.57/operator/) to deploy Jaeger instances.
 
 You can install it with `make jaeger-operator`.
 
@@ -112,7 +114,7 @@ jaeger-operator-8f4765884-7ntr4   2/2     Running   0          12s
 ```
 
 ## Kiali operator
-[Kiali](https://kiali.io/) is an open-source observability console for Istio service mesh, providing a visual interface to manage and monitor microservices within the mesh. It offers detailed insights into the structure, health, and performance of the microservices, allowing users to visualize service interactions, traffic flow, and dependencies. Kiali integrates with other observability tools like Jaeger for tracing and Prometheus for metrics, enabling comprehensive monitoring and debugging capabilities. It also provides features for validating Istio configurations, identifying potential issues, and facilitating the efficient operation and troubleshooting of microservices in a service mesh environment. We will use the Kiali operator to deploy a Kiali instance in our cluster. For this tutorial we will install Kiali using the Kiali operator for Kubernetes.
+The Kiali operator will be used to deploy Kiali instances in our Kubernetes cluster.
 
 You can install it with `make kiali-operator`.
 

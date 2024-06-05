@@ -13,6 +13,7 @@ ISTIO_VERSION ?= "1.22.0"
 # Applications
 APP_IMG ?= ttl.sh/iblancasa/demo-app1
 APP2_IMG ?= ttl.sh/iblancasa/demo-app2
+APP3_IMG ?= ttl.sh/iblancasa/demo-app3
 
 
 help: ## Show help message
@@ -92,6 +93,8 @@ apps:  ## Build and push the demo applications images
 	docker push $(APP_IMG)
 	cd apps && docker build -t $(APP2_IMG) app2
 	docker push $(APP2_IMG)
+	cd apps && docker build -t $(APP3_IMG) app3
+	docker push $(APP3_IMG)
 
 .PHONY: deploy-apps
 deploy-apps:  ## Deploy the demo applications in the local cluster
