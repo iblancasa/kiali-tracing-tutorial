@@ -13,3 +13,4 @@ Each tutorial step is located in a separate file:
 2. [Deploying workloads](steps/02-deploying-workloads.md)
 3. [Tracing is broken](steps/03-tracing-is-broken.md)
 4. [Autoinstrumenting your app](steps/04-autoinstrumenting-your-app.md)
+5. [Next steps](steps/05-next-steps.md)
