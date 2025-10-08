@@ -1,6 +1,7 @@
 import flask
 from time import sleep
 import requests
+import random
 
 app = flask.Flask(__name__)
 
@@ -26,7 +27,11 @@ def context_get_headers(headers):
 def no_forwarding():
     # Simulate some work
     sleep(0.1)
-    response = requests.get('http://app3:9080')
+    if random.random() < 0.3:
+        response = requests.get('http://app3:9080/no-header-forwarding')
+    else:
+        response = requests.get('http://app5:9080/')
+
     # Simulate some work
     sleep(0.1)
     return flask.Response(response.text)
@@ -37,7 +42,10 @@ def forwarding():
     headers = context_get_headers(dict(flask.request.headers))
     # Simulate some work
     sleep(0.1)
-    response = requests.get('http://app3:9080', headers=headers)
+    if random.random() < 0.3:
+        response = requests.get('http://app3:9080/no-header-forwarding', headers=headers)
+    else:
+        response = requests.get('http://app5:9080/', headers=headers)
     # Simulate some work
     sleep(0.1)
     return flask.Response(response.text)

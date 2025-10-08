@@ -11,9 +11,12 @@ ISTIOCTL ?= $(LOCALBIN)/istioctl
 ISTIO_VERSION ?= "1.22.0"
 
 # Applications
-APP_IMG ?= quay.io/iblancas/devconf-demo-app-1
-APP2_IMG ?= quay.io/iblancas/devconf-demo-app-2
-APP3_IMG ?= quay.io/iblancas/devconf-demo-app-3
+REPO ?= ghcr.io/iblancasa
+APP_IMG ?= $(REPO)/devconf-demo-app-1
+APP2_IMG ?= $(REPO)/devconf-demo-app-2
+APP3_IMG ?= $(REPO)/devconf-demo-app-3
+APP4_IMG ?= $(REPO)/devconf-demo-app-4
+APP5_IMG ?= $(REPO)/devconf-demo-app-5
 
 
 help: ## Show help message
@@ -89,13 +92,13 @@ kiali-operator: ## Deploy the Kiali operator
 
 ################## Application management #######################################################################################
 .PHONY: apps
-apps:  ## Build and push the demo applications images
-	cd apps && docker build -t $(APP_IMG) app
-	docker push $(APP_IMG)
-	cd apps && docker build -t $(APP2_IMG) app2
-	docker push $(APP2_IMG)
-	cd apps && docker build -t $(APP3_IMG) app3
-	docker push $(APP3_IMG)
+apps:  ## Build and push the demo applications images for linux/amd64 and linux/arm64
+	docker buildx create --use --name multiarch-builder || true
+	cd apps && docker buildx build --platform linux/amd64,linux/arm64 -t $(APP_IMG) --push app
+	cd apps && docker buildx build --platform linux/amd64,linux/arm64 -t $(APP2_IMG) --push app2
+	cd apps && docker buildx build --platform linux/amd64,linux/arm64 -t $(APP3_IMG) --push app3
+	cd apps && docker buildx build --platform linux/amd64,linux/arm64 -t $(APP4_IMG) --push app4
+	cd apps && docker buildx build --platform linux/amd64,linux/arm64 -t $(APP5_IMG) --push app5
 
 .PHONY: deploy-apps
 deploy-apps:  ## Deploy the demo applications in the local cluster
@@ -106,3 +109,5 @@ restart-apps: ## Restart the deployments
 	kubectl rollout restart deployment app1-v1 -n demo
 	kubectl rollout restart deployment app2-v1 -n demo
 	kubectl rollout restart deployment app3-v1 -n demo
+	kubectl rollout restart deployment app4-v1 -n demo
+	kubectl rollout restart deployment app5-v1 -n demo

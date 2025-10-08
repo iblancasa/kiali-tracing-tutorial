@@ -28,7 +28,7 @@ The cloud-provider-kind project is an extension for KIND (Kubernetes IN Docker) 
 Learn how to install [from the GitHub repository](https://github.com/kubernetes-sigs/cloud-provider-kind).
 
 ## Setting up the environment
-First, we need to create our Kubernetes cluster. You can just run `make start-kind`. Note that this command will also install the Nginx Ingress controller for kind.
+First, we need to create our Kubernetes cluster. You can just run `make start-cluster`. Note that this command will also install the Nginx Ingress controller for kind.
 
 ```sh
 $ make start-cluster
