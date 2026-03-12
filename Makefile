@@ -4,8 +4,9 @@ LOCALBIN ?= $(shell pwd)/bin
 # Dependencies
 CERTMANAGER_VERSION ?= 1.10.0
 CMCTL = $(LOCALBIN)/cmctl
-OPENTELEMETRY_OPERATOR_VERSION ?= 0.101.0
+OPENTELEMETRY_OPERATOR_VERSION ?= 0.146.0
 JAEGER_OPERATOR_VERSION ?= 1.57.0
+KUBE_RBAC_PROXY_IMAGE ?= quay.io/brancz/kube-rbac-proxy:v0.13.1
 
 ISTIOCTL ?= $(LOCALBIN)/istioctl
 ISTIO_VERSION ?= "1.22.0"
@@ -60,11 +61,15 @@ cert-manager: ## Deploy cert-manager
 .PHONY: opentelemetry-operator
 opentelemetry-operator: ## Deploy the OpenTelemetry operator
 	kubectl apply -f https://github.com/open-telemetry/opentelemetry-operator/releases/download/v$(OPENTELEMETRY_OPERATOR_VERSION)/opentelemetry-operator.yaml
+	kubectl -n opentelemetry-operator-system set image deployment/opentelemetry-operator-controller-manager kube-rbac-proxy=$(KUBE_RBAC_PROXY_IMAGE)
+	kubectl -n opentelemetry-operator-system rollout status deployment/opentelemetry-operator-controller-manager --timeout=180s
 
 .PHONY: jaeger-operator
 jaeger-operator: ## Deploy the Jaeger operator
 	kubectl create namespace observability 2>&1 | grep -v "already exists" || true
 	kubectl apply -f https://github.com/jaegertracing/jaeger-operator/releases/download/v$(JAEGER_OPERATOR_VERSION)/jaeger-operator.yaml
+	kubectl -n observability set image deployment/jaeger-operator kube-rbac-proxy=$(KUBE_RBAC_PROXY_IMAGE)
+	kubectl -n observability rollout status deployment/jaeger-operator --timeout=180s
 
 ################## Infrastructure management ####################################################################################
 .PHONY: infra
