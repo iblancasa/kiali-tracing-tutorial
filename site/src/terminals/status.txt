@@ -1,0 +1,18 @@
+[1;32m$[0m make status
+kubectl --context kind-kiali-tracing get pods -n istio-system
+NAME                                    READY   STATUS    RESTARTS   AGE
+grafana-5cb4fdd57-dbx94                 1/1     Running   0          48m
+istio-ingressgateway-5976f8d57c-dnvjw   1/1     Running   0          62m
+istiod-b98566cbd-jfn7h                  1/1     Running   0          64m
+jaeger-c65d5d999-6f8wm                  1/1     Running   0          19s
+kiali-7fd564d9c6-khjvf                  1/1     Running   0          38m
+otel-collector-85d85b9f5c-gm7f7         1/1     Running   0          36m
+prometheus-6447557fdc-t4zzh             2/2     Running   0          59m
+
+[1;32m$[0m make urls
+
+  Mesh Pizza   http://localhost:8080      (after step 2)
+  Kiali        http://localhost:20001
+  Jaeger       http://localhost:16686
+  Grafana      http://localhost:3000
+  Prometheus   http://localhost:9090

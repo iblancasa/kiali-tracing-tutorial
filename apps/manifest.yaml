@@ -1,276 +1,991 @@
+# Mesh Pizza: the demo of the tutorial. Fifteen workloads in the demo
+# namespace, all inside the Istio mesh, plus a load generator outside it.
+#
+#   loadgen -> ingress gateway -> frontend -+-> menu -+-> pricing -> promotions
+#                                           |         '-> reviews (v1 80%, v2 20%) -> ratings (v2 only)
+#                                           |
+#                                           '-> orders -+-> inventory -> redis (TCP)
+#                                                       +-> payments -> fraud        payments fails 15% of the charges
+#                                                       +-> kitchen -> inventory
+#                                                       +-> delivery -> maps         maps is slow 20% of the time
+#                                                       '-> notifications
+#
+# Every service runs the same image, built from this directory by
+# `make prepare` (or `make build load`). SERVICE picks the module to run.
 apiVersion: v1
 kind: Namespace
 metadata:
   name: demo
   labels:
+    # Tells Istio to inject its proxy into every pod of this namespace.
     istio-injection: enabled
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: app1
+  name: frontend
   namespace: demo
   labels:
-    app: app1
-    service: app1
+    app: frontend
+    service: frontend
 spec:
   ports:
-  - port: 9080
+  - port: 8080
     name: http
   selector:
-    app: app1
+    app: frontend
 ---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: demo-app1
+  name: frontend
   namespace: demo
   labels:
-    account: app1
+    account: frontend
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: app1-v1
+  name: frontend
   namespace: demo
   labels:
-    app: app1
+    app: frontend
     version: v1
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: app1
+      app: frontend
       version: v1
   template:
     metadata:
-      annotations:
-        instrumentation.opentelemetry.io/inject-python: "true"
       labels:
-        app: app1
+        app: frontend
         version: v1
     spec:
-      serviceAccountName: demo-app1
+      serviceAccountName: frontend
       containers:
-      - name: app1
-        image: ghcr.io/iblancasa/devconf-demo-app-1
-        imagePullPolicy: Always
+      - name: frontend
+        image: kiali-tracing-tutorial/mesh-pizza:latest
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: SERVICE
+          value: frontend
         ports:
-        - containerPort: 9080
+        - containerPort: 8080
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: 8080
+        resources:
+          requests:
+            cpu: 10m
+            memory: 48Mi
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: app2
+  name: menu
   namespace: demo
   labels:
-    app: app2
-    service: app2
+    app: menu
+    service: menu
 spec:
   ports:
-  - port: 9080
+  - port: 8080
     name: http
   selector:
-    app: app2
+    app: menu
 ---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: demo-app2
+  name: menu
   namespace: demo
   labels:
-    account: app2
+    account: menu
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: app2-v1
+  name: menu
   namespace: demo
   labels:
-    app: app2
+    app: menu
     version: v1
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: app2
+      app: menu
       version: v1
   template:
     metadata:
-      annotations:
-        instrumentation.opentelemetry.io/inject-python: "true"
       labels:
-        app: app2
+        app: menu
         version: v1
     spec:
-      serviceAccountName: demo-app2
+      serviceAccountName: menu
       containers:
-      - name: app2
-        image: ghcr.io/iblancasa/devconf-demo-app-2
-        imagePullPolicy: Always
+      - name: menu
+        image: kiali-tracing-tutorial/mesh-pizza:latest
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: SERVICE
+          value: menu
         ports:
-        - containerPort: 9080
+        - containerPort: 8080
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: 8080
+        resources:
+          requests:
+            cpu: 10m
+            memory: 48Mi
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: app3
+  name: pricing
   namespace: demo
   labels:
-    app: app3
-    service: app3
+    app: pricing
+    service: pricing
 spec:
   ports:
-  - port: 9080
+  - port: 8080
     name: http
   selector:
-    app: app3
+    app: pricing
 ---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: demo-app3
+  name: pricing
   namespace: demo
   labels:
-    account: app3
+    account: pricing
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: app3-v1
+  name: pricing
   namespace: demo
   labels:
-    app: app3
+    app: pricing
     version: v1
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: app3
+      app: pricing
       version: v1
   template:
     metadata:
-      annotations:
-        instrumentation.opentelemetry.io/inject-python: "true"
       labels:
-        app: app3
+        app: pricing
         version: v1
     spec:
-      serviceAccountName: demo-app3
+      serviceAccountName: pricing
       containers:
-      - name: app3
-        image: ghcr.io/iblancasa/devconf-demo-app-3
-        imagePullPolicy: Always
+      - name: pricing
+        image: kiali-tracing-tutorial/mesh-pizza:latest
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: SERVICE
+          value: pricing
         ports:
-        - containerPort: 9080
+        - containerPort: 8080
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: 8080
+        resources:
+          requests:
+            cpu: 10m
+            memory: 48Mi
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: app4
+  name: promotions
   namespace: demo
   labels:
-    app: app4
-    service: app4
+    app: promotions
+    service: promotions
 spec:
   ports:
-  - port: 9080
+  - port: 8080
     name: http
   selector:
-    app: app4
+    app: promotions
 ---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: demo-app4
+  name: promotions
   namespace: demo
   labels:
-    account: app4
+    account: promotions
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: app4-v1
+  name: promotions
   namespace: demo
   labels:
-    app: app4
+    app: promotions
     version: v1
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: app4
+      app: promotions
       version: v1
   template:
     metadata:
-      annotations:
-        instrumentation.opentelemetry.io/inject-python: "true"
       labels:
-        app: app4
+        app: promotions
         version: v1
     spec:
-      serviceAccountName: demo-app4
+      serviceAccountName: promotions
       containers:
-      - name: app4
-        image: ghcr.io/iblancasa/devconf-demo-app-4
-        imagePullPolicy: Always
+      - name: promotions
+        image: kiali-tracing-tutorial/mesh-pizza:latest
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: SERVICE
+          value: promotions
         ports:
-        - containerPort: 9080
+        - containerPort: 8080
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: 8080
+        resources:
+          requests:
+            cpu: 10m
+            memory: 48Mi
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: app5
+  name: reviews
   namespace: demo
   labels:
-    app: app5
-    service: app5
+    app: reviews
+    service: reviews
 spec:
   ports:
-  - port: 9080
+  - port: 8080
     name: http
   selector:
-    app: app5
+    app: reviews
 ---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: demo-app5
+  name: reviews
   namespace: demo
   labels:
-    account: app5
+    account: reviews
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: app5-v1
+  name: reviews-v1
   namespace: demo
   labels:
-    app: app5
+    app: reviews
     version: v1
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: app5
+      app: reviews
       version: v1
   template:
     metadata:
-      annotations:
-        instrumentation.opentelemetry.io/inject-python: "true"
       labels:
-        app: app5
+        app: reviews
         version: v1
     spec:
-      serviceAccountName: demo-app5
+      serviceAccountName: reviews
       containers:
-      - name: app5
-        image: ghcr.io/iblancasa/devconf-demo-app-5
-        imagePullPolicy: Always
+      - name: reviews
+        image: kiali-tracing-tutorial/mesh-pizza:latest
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: SERVICE
+          value: reviews
+        - name: VERSION
+          value: "v1"
         ports:
-        - containerPort: 9080
+        - containerPort: 8080
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: 8080
+        resources:
+          requests:
+            cpu: 10m
+            memory: 48Mi
 ---
-apiVersion: networking.istio.io/v1alpha3
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: reviews-v2
+  namespace: demo
+  labels:
+    app: reviews
+    version: v2
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: reviews
+      version: v2
+  template:
+    metadata:
+      labels:
+        app: reviews
+        version: v2
+    spec:
+      serviceAccountName: reviews
+      containers:
+      - name: reviews
+        image: kiali-tracing-tutorial/mesh-pizza:latest
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: SERVICE
+          value: reviews
+        - name: VERSION
+          value: "v2"
+        - name: RATINGS_ENABLED
+          value: "true"
+        ports:
+        - containerPort: 8080
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: 8080
+        resources:
+          requests:
+            cpu: 10m
+            memory: 48Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ratings
+  namespace: demo
+  labels:
+    app: ratings
+    service: ratings
+spec:
+  ports:
+  - port: 8080
+    name: http
+  selector:
+    app: ratings
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: ratings
+  namespace: demo
+  labels:
+    account: ratings
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ratings
+  namespace: demo
+  labels:
+    app: ratings
+    version: v1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ratings
+      version: v1
+  template:
+    metadata:
+      labels:
+        app: ratings
+        version: v1
+    spec:
+      serviceAccountName: ratings
+      containers:
+      - name: ratings
+        image: kiali-tracing-tutorial/mesh-pizza:latest
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: SERVICE
+          value: ratings
+        ports:
+        - containerPort: 8080
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: 8080
+        resources:
+          requests:
+            cpu: 10m
+            memory: 48Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: orders
+  namespace: demo
+  labels:
+    app: orders
+    service: orders
+spec:
+  ports:
+  - port: 8080
+    name: http
+  selector:
+    app: orders
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: orders
+  namespace: demo
+  labels:
+    account: orders
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: orders
+  namespace: demo
+  labels:
+    app: orders
+    version: v1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: orders
+      version: v1
+  template:
+    metadata:
+      labels:
+        app: orders
+        version: v1
+    spec:
+      serviceAccountName: orders
+      containers:
+      - name: orders
+        image: kiali-tracing-tutorial/mesh-pizza:latest
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: SERVICE
+          value: orders
+        ports:
+        - containerPort: 8080
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: 8080
+        resources:
+          requests:
+            cpu: 10m
+            memory: 48Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: inventory
+  namespace: demo
+  labels:
+    app: inventory
+    service: inventory
+spec:
+  ports:
+  - port: 8080
+    name: http
+  selector:
+    app: inventory
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: inventory
+  namespace: demo
+  labels:
+    account: inventory
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: inventory
+  namespace: demo
+  labels:
+    app: inventory
+    version: v1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: inventory
+      version: v1
+  template:
+    metadata:
+      labels:
+        app: inventory
+        version: v1
+    spec:
+      serviceAccountName: inventory
+      containers:
+      - name: inventory
+        image: kiali-tracing-tutorial/mesh-pizza:latest
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: SERVICE
+          value: inventory
+        ports:
+        - containerPort: 8080
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: 8080
+        resources:
+          requests:
+            cpu: 10m
+            memory: 48Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: payments
+  namespace: demo
+  labels:
+    app: payments
+    service: payments
+spec:
+  ports:
+  - port: 8080
+    name: http
+  selector:
+    app: payments
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: payments
+  namespace: demo
+  labels:
+    account: payments
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: payments
+  namespace: demo
+  labels:
+    app: payments
+    version: v1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: payments
+      version: v1
+  template:
+    metadata:
+      labels:
+        app: payments
+        version: v1
+    spec:
+      serviceAccountName: payments
+      containers:
+      - name: payments
+        image: kiali-tracing-tutorial/mesh-pizza:latest
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: SERVICE
+          value: payments
+        - name: BANK_FAILURE_RATE
+          value: "0.15"
+        ports:
+        - containerPort: 8080
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: 8080
+        resources:
+          requests:
+            cpu: 10m
+            memory: 48Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: fraud
+  namespace: demo
+  labels:
+    app: fraud
+    service: fraud
+spec:
+  ports:
+  - port: 8080
+    name: http
+  selector:
+    app: fraud
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: fraud
+  namespace: demo
+  labels:
+    account: fraud
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fraud
+  namespace: demo
+  labels:
+    app: fraud
+    version: v1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: fraud
+      version: v1
+  template:
+    metadata:
+      labels:
+        app: fraud
+        version: v1
+    spec:
+      serviceAccountName: fraud
+      containers:
+      - name: fraud
+        image: kiali-tracing-tutorial/mesh-pizza:latest
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: SERVICE
+          value: fraud
+        ports:
+        - containerPort: 8080
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: 8080
+        resources:
+          requests:
+            cpu: 10m
+            memory: 48Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kitchen
+  namespace: demo
+  labels:
+    app: kitchen
+    service: kitchen
+spec:
+  ports:
+  - port: 8080
+    name: http
+  selector:
+    app: kitchen
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: kitchen
+  namespace: demo
+  labels:
+    account: kitchen
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kitchen
+  namespace: demo
+  labels:
+    app: kitchen
+    version: v1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kitchen
+      version: v1
+  template:
+    metadata:
+      labels:
+        app: kitchen
+        version: v1
+    spec:
+      serviceAccountName: kitchen
+      containers:
+      - name: kitchen
+        image: kiali-tracing-tutorial/mesh-pizza:latest
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: SERVICE
+          value: kitchen
+        ports:
+        - containerPort: 8080
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: 8080
+        resources:
+          requests:
+            cpu: 10m
+            memory: 48Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: delivery
+  namespace: demo
+  labels:
+    app: delivery
+    service: delivery
+spec:
+  ports:
+  - port: 8080
+    name: http
+  selector:
+    app: delivery
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: delivery
+  namespace: demo
+  labels:
+    account: delivery
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: delivery
+  namespace: demo
+  labels:
+    app: delivery
+    version: v1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: delivery
+      version: v1
+  template:
+    metadata:
+      labels:
+        app: delivery
+        version: v1
+    spec:
+      serviceAccountName: delivery
+      containers:
+      - name: delivery
+        image: kiali-tracing-tutorial/mesh-pizza:latest
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: SERVICE
+          value: delivery
+        ports:
+        - containerPort: 8080
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: 8080
+        resources:
+          requests:
+            cpu: 10m
+            memory: 48Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: maps
+  namespace: demo
+  labels:
+    app: maps
+    service: maps
+spec:
+  ports:
+  - port: 8080
+    name: http
+  selector:
+    app: maps
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: maps
+  namespace: demo
+  labels:
+    account: maps
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: maps
+  namespace: demo
+  labels:
+    app: maps
+    version: v1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: maps
+      version: v1
+  template:
+    metadata:
+      labels:
+        app: maps
+        version: v1
+    spec:
+      serviceAccountName: maps
+      containers:
+      - name: maps
+        image: kiali-tracing-tutorial/mesh-pizza:latest
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: SERVICE
+          value: maps
+        - name: SLOW_RATE
+          value: "0.2"
+        ports:
+        - containerPort: 8080
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: 8080
+        resources:
+          requests:
+            cpu: 10m
+            memory: 48Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: notifications
+  namespace: demo
+  labels:
+    app: notifications
+    service: notifications
+spec:
+  ports:
+  - port: 8080
+    name: http
+  selector:
+    app: notifications
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: notifications
+  namespace: demo
+  labels:
+    account: notifications
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: notifications
+  namespace: demo
+  labels:
+    app: notifications
+    version: v1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: notifications
+      version: v1
+  template:
+    metadata:
+      labels:
+        app: notifications
+        version: v1
+    spec:
+      serviceAccountName: notifications
+      containers:
+      - name: notifications
+        image: kiali-tracing-tutorial/mesh-pizza:latest
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: SERVICE
+          value: notifications
+        ports:
+        - containerPort: 8080
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: 8080
+        resources:
+          requests:
+            cpu: 10m
+            memory: 48Mi
+---
+# Redis keeps the stock counters of inventory. Plain TCP inside the mesh.
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis
+  namespace: demo
+  labels:
+    app: redis
+    service: redis
+spec:
+  ports:
+  - port: 6379
+    name: tcp-redis
+  selector:
+    app: redis
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis
+  namespace: demo
+  labels:
+    app: redis
+    version: v1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis
+      version: v1
+  template:
+    metadata:
+      labels:
+        app: redis
+        version: v1
+    spec:
+      containers:
+      - name: redis
+        image: redis:8-alpine
+        ports:
+        - containerPort: 6379
+        resources:
+          requests:
+            cpu: 10m
+            memory: 32Mi
+---
+# Traffic from outside the mesh comes in through the Istio ingress gateway.
+# A Gateway opens the port, a VirtualService says where the requests go.
+apiVersion: networking.istio.io/v1
 kind: Gateway
 metadata:
   name: demo-gateway
@@ -286,10 +1001,10 @@ spec:
     hosts:
     - "*"
 ---
-apiVersion: networking.istio.io/v1alpha3
+apiVersion: networking.istio.io/v1
 kind: VirtualService
 metadata:
-  name: demo
+  name: frontend
   namespace: demo
 spec:
   hosts:
@@ -297,31 +1012,84 @@ spec:
   gateways:
   - demo-gateway
   http:
-  - match:
-    - uri:
-        exact: /no-header-forwarding
-    route:
+  - route:
     - destination:
-        host: app1
+        host: frontend
         port:
-          number: 9080
-  - match:
-    - uri:
-        exact: /header-forwarding
-    route:
-    - destination:
-        host: app1
-        port:
-          number: 9080
+          number: 8080
 ---
-apiVersion: networking.istio.io/v1alpha3
+# Two versions of reviews. The DestinationRule names them, the
+# VirtualService sends 80% of the requests to v1 and 20% to v2.
+apiVersion: networking.istio.io/v1
 kind: DestinationRule
 metadata:
-  name: app1
+  name: reviews
   namespace: demo
 spec:
-  host: app1
+  host: reviews
   subsets:
   - name: v1
     labels:
       version: v1
+  - name: v2
+    labels:
+      version: v2
+---
+apiVersion: networking.istio.io/v1
+kind: VirtualService
+metadata:
+  name: reviews
+  namespace: demo
+spec:
+  hosts:
+  - reviews
+  http:
+  - route:
+    - destination:
+        host: reviews
+        subset: v1
+      weight: 80
+    - destination:
+        host: reviews
+        subset: v2
+      weight: 20
+---
+# Background customers. Outside the mesh on purpose: no istio-injection
+# label, so no sidecar, and the requests enter through the ingress gateway.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: loadgen
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: loadgen
+  namespace: loadgen
+  labels:
+    app: loadgen
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: loadgen
+  template:
+    metadata:
+      labels:
+        app: loadgen
+    spec:
+      containers:
+      - name: loadgen
+        image: kiali-tracing-tutorial/mesh-pizza:latest
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: SERVICE
+          value: loadgen
+        - name: TARGET
+          value: http://istio-ingressgateway.istio-system.svc.cluster.local
+        - name: REQUESTS_PER_SECOND
+          value: "3"
+        resources:
+          requests:
+            cpu: 10m
+            memory: 32Mi

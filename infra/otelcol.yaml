@@ -1,30 +1,34 @@
+# OpenTelemetry Collector, managed by the OpenTelemetry operator.
+# The operator creates a Deployment and a Service called otel-collector.
+#
+# It receives OTLP from the Envoy proxies (gRPC, 4317) and, from step 4,
+# from the auto-instrumented applications (HTTP, 4318). Everything goes to
+# Jaeger.
 apiVersion: opentelemetry.io/v1beta1
 kind: OpenTelemetryCollector
 metadata:
-  name: instance
+  name: otel
   namespace: istio-system
 spec:
-  observability:
-    metrics:
-      enableMetrics: false
+  mode: deployment
   config:
     receivers:
-      zipkin: {}
       otlp:
         protocols:
-          grpc: {}
-          http: {}
+          grpc:
+            endpoint: 0.0.0.0:4317
+          http:
+            endpoint: 0.0.0.0:4318
     processors:
-
+      batch: {}
     exporters:
-      otlp:
-        endpoint: jaeger-collector:4317
+      otlp_grpc/jaeger:
+        endpoint: jaeger.istio-system.svc.cluster.local:4317
         tls:
           insecure: true
-
     service:
       pipelines:
         traces:
-          receivers: [zipkin,otlp]
-          processors: []
-          exporters: [otlp]
+          receivers: [otlp]
+          processors: [batch]
+          exporters: [otlp_grpc/jaeger]

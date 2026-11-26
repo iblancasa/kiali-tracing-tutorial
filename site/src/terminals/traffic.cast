@@ -1,0 +1,6 @@
+{"version":2,"width":120,"height":24,"timestamp":1795709495,"idle_time_limit":2.0,"command":"bash /var/folders/jb/hkvkhg2n2v5cvc5gc0vmf2000000gp/T/tmp.f370dEysqq","env":{"SHELL":"/bin/zsh"}}
+[0.016921, "o", "\u001b[1;32m$\u001b[0m kubectl -n loadgen logs deployment/loadgen --tail=8\r\n"]
+[0.058171, "o", "GET  /api/menu    -> 200 in 43 ms\r\nPOST /api/orders  -> 502 in 125 ms\r\nPOST /api/orders  -> 200 in 140 ms\r\nPOST /api/orders  -> 200 in 154 ms\r\nGET  /api/menu    -> 200 in 50 ms\r\nPOST /api/orders  -> 200 in 147 ms\r\nGET  /api/menu    -> 200 in 49 ms\r\nGET  /api/menu    -> 200 in 53 ms\r\n"]
+[0.86644, "o", "\u001b[1;32m$\u001b[0m make order\r\n"]
+[1.038296, "o", "{\"eta_minutes\":19,\"order\":\"756848db\"}\r\n\r\n-> HTTP 200 in 0.146477s\r\n"]
+[1.850926, "x", "0"]

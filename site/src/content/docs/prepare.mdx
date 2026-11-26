@@ -1,0 +1,132 @@
+---
+title: Before the tutorial
+description: Install the tools and run make prepare at home. Fifteen minutes on good wifi, zero minutes on conference wifi.
+---
+
+import { Steps, Aside, Tabs, TabItem } from '@astrojs/starlight/components';
+import Terminal from '../../components/Terminal.astro';
+
+Do this **before** the event, on a network you trust. The room will not have
+the bandwidth for 30 people pulling images at once.
+
+## Requirements
+
+| Tool | Version | Notes |
+|------|---------|-------|
+| Docker | any recent | Docker Desktop, Colima, Rancher Desktop or Podman with the docker CLI. Give the VM **8 GB RAM** and 4 CPUs. |
+| [kubectl](https://kubernetes.io/docs/tasks/tools/) | any recent | |
+| [helm](https://helm.sh/docs/intro/install/) | 3 or 4 | Installs the Kiali operator. |
+| make, git, curl | | Already there on macOS and Linux. |
+
+Apple Silicon and Intel both work. About 5 GB of disk for images.
+[kind](https://kind.sigs.k8s.io/) and `istioctl` are not in the list:
+`make prepare` downloads the right versions into `bin/`. A kind older than
+0.33 cannot start the Kubernetes 1.37 node image, so the tutorial does not
+use the one in your `PATH`.
+
+<Tabs>
+  <TabItem label="macOS">
+  ```bash
+  brew install kubectl helm
+  # Docker Desktop: Settings > Resources > Memory >= 8 GB
+  # or Colima:
+  colima start --cpu 4 --memory 8
+  ```
+  </TabItem>
+  <TabItem label="Linux">
+  ```bash
+  # kubectl: https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/
+  # helm:    https://helm.sh/docs/intro/install/
+  ```
+  </TabItem>
+  <TabItem label="Windows">
+  Use WSL2 with Docker Desktop's WSL integration, then follow the Linux
+  tab inside WSL. Native Windows is untested.
+  </TabItem>
+</Tabs>
+
+## Prepare
+
+<Steps>
+
+1. Clone and check your tools:
+
+   ```bash
+   git clone https://github.com/iblancasa/kiali-tracing-tutorial.git
+   cd kiali-tracing-tutorial
+   make check
+   ```
+
+   <Terminal src="check" title="make check" />
+
+   This transcript is from a laptop where the cluster already exists. On
+   a first run that line is missing, and a host port in use gives a
+   warning.
+
+2. Install everything. Ten to fifteen minutes, most of it downloading
+   images:
+
+   ```bash
+   make prepare
+   ```
+
+   This creates a kind cluster called `kiali-tracing`, installs
+   cert-manager, the OpenTelemetry operator and the Kiali operator, then
+   Istio, Prometheus, Grafana, the OpenTelemetry Collector, Jaeger and
+   Kiali, and builds the image of the demo application. The demo itself is
+   **not** deployed. That is step 2.
+
+3. Verify:
+
+   ```bash
+   make status
+   ```
+
+   <Terminal src="status" title="make status" />
+
+   Open [localhost:20001](http://localhost:20001) (Kiali, an empty mesh),
+   [localhost:16686](http://localhost:16686) (Jaeger, no services yet),
+   [localhost:3000](http://localhost:3000) (Grafana) and
+   [localhost:9090](http://localhost:9090) (Prometheus).
+
+</Steps>
+
+<Aside type="note" title="Not on the day itself">
+`make prepare` needs the network: container images, the operators'
+manifests, `istioctl`. Once it has finished, the rest of the tutorial needs
+one more image, `redis:8-alpine`, pulled when you deploy the demo in
+step 2. Run `docker pull redis:8-alpine && bin/kind-0.33.0 load docker-image --name kiali-tracing redis:8-alpine`
+at home if you expect no wifi at all.
+</Aside>
+
+## What `make prepare` installs
+
+```
+namespace cert-manager                   cert-manager, for the operator webhooks
+namespace opentelemetry-operator-system  OpenTelemetry operator
+namespace kiali-operator                 Kiali operator
+
+namespace istio-system
+  istiod                 Istio control plane
+  istio-ingressgateway   the door of the mesh           :8080  (host)
+  kiali                  mesh console                   :20001 (host)
+  jaeger                 traces                         :16686 (host)
+  grafana                dashboards                     :3000  (host)
+  prometheus             metrics                        :9090  (host)
+  otel-collector         receives spans, sends them to Jaeger
+```
+
+Host ports come from the kind config
+([kind.yaml](https://github.com/iblancasa/kiali-tracing-tutorial/blob/main/kind.yaml)).
+If one of them is taken on your laptop, `make port-forward` is the
+fallback.
+
+`make prepare` is the sum of smaller targets. [Step 1](/kiali-tracing-tutorial/steps/01-infrastructure/)
+goes through them one by one.
+
+## Something failed?
+
+See [Troubleshooting](/kiali-tracing-tutorial/reference/troubleshooting/).
+The usual causes: Docker VM too small or a host port in use.
+Every target can be run again safely, so `make prepare` after fixing the
+cause continues where it stopped.

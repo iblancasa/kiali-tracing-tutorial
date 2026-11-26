@@ -1,0 +1,7 @@
+{"version":2,"width":120,"height":24,"timestamp":1795709667,"idle_time_limit":2.0,"command":"bash /var/folders/jb/hkvkhg2n2v5cvc5gc0vmf2000000gp/T/tmp.SWiNgJquBy","env":{"SHELL":"/bin/zsh"}}
+[0.014467, "o", "\u001b[1;32m$\u001b[0m scripts/traces.py --minutes 1 --lines 3\r\n"]
+[0.077714, "o", "TRACE      SPANS SERVICES ERRORS   DURATION  ROOT\r\nd73d1cd8       3        2      0     148 ms  istio-ingressgateway.istio-system: frontend.demo.svc.cluster.local:8080/*\r\n"]
+[0.077724, "o", "bf45d578       3        2      0      49 ms  istio-ingressgateway.istio-system: frontend.demo.svc.cluster.local:8080/*\r\n"]
+[0.077726, "o", "28dbacfd       3        2      0      44 ms  istio-ingressgateway.istio-system: frontend.demo.svc.cluster.local:8080/*\r\n"]
+[0.077749, "o", "\r\n111 traces of istio-ingressgateway.istio-system in the last 1 min. Spans per trace: min 3, median 3, max 3.\r\n"]
+[0.897217, "x", "0"]

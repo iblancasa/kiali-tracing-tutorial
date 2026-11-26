@@ -1,0 +1,12 @@
+[1;32m$[0m kubectl -n demo get pod -l app=orders -o jsonpath='{range .items[0].spec.initContainers[*]}{.name}{"\n"}{end}'
+istio-init
+istio-proxy
+opentelemetry-auto-instrumentation-python
+[1;32m$[0m kubectl -n demo get pod -l app=orders -o jsonpath='{range .items[0].spec.containers[0].env[*]}{.name}={.value}{"\n"}{end}' | grep -E 'PYTHONPATH|OTEL_(SERVICE_NAME|TRACES_EXPORTER|EXPORTER_OTLP|PROPAGATORS|PYTHON)'
+OTEL_PYTHON_EXCLUDED_URLS=healthz
+PYTHONPATH=/otel-auto-instrumentation-python/opentelemetry/instrumentation/auto_instrumentation:/otel-auto-instrumentation-python
+OTEL_EXPORTER_OTLP_PROTOCOL=http/protobuf
+OTEL_TRACES_EXPORTER=otlp
+OTEL_SERVICE_NAME=orders
+OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector.istio-system.svc.cluster.local:4318
+OTEL_PROPAGATORS=tracecontext,baggage

@@ -1,0 +1,74 @@
+---
+title: "Step 5: next steps"
+description: Where to go after the tutorial. Span metrics, Kubernetes metadata, sampling, storage that survives a restart and the documentation of every tool you used.
+sidebar:
+  label: 5. Next steps
+---
+
+import { LinkCard, CardGrid } from '@astrojs/starlight/components';
+
+Your cluster is still running. These are the things worth trying on it,
+ordered from ten minutes to an afternoon.
+
+## Ten minutes each
+
+- **Break something else.** `kubectl -n demo scale deployment fraud --replicas=0`
+  and watch Kiali: the edge from `payments` to `fraud` turns red and the
+  traces through `payments` end in an error span with `response.flags=UH`
+  (no healthy upstream).
+- **Add the `debug` exporter** to the traces pipeline in `infra/otelcol.yaml`,
+  apply it and read `kubectl -n istio-system logs deploy/otel-collector`.
+  You see every span that arrives, and who sent it.
+- **Lower the sampling.** Set `randomSamplingPercentage: 10` in
+  `infra/telemetry.yaml`. The ingress gateway takes the decision once and
+  every other span of the trace follows it, because the decision travels in
+  the same `traceparent` header. That is what `parentbased` in the
+  `Instrumentation` sampler means.
+
+## The OpenTelemetry Collector
+
+The Collector of this tutorial receives and forwards. It can do more:
+
+- The [span metrics connector](https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/connector/spanmetricsconnector/README.md)
+  derives request, error and duration metrics from the spans. Jaeger's
+  **Monitor** tab reads them.
+- The [k8sattributes processor](https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/processor/k8sattributesprocessor)
+  adds pod, deployment and node names to every span.
+- The [resource detection processor](https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/processor/resourcedetectionprocessor)
+  adds information about the host or the cloud provider.
+- The [tail sampling processor](https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/processor/tailsamplingprocessor)
+  keeps every trace with an error and a small part of the rest.
+- The Collector reports on itself. See
+  [internal telemetry](https://opentelemetry.io/docs/collector/internal-telemetry/).
+
+The connector and the two processors are in the contrib distribution. Set
+`spec.image` in the `OpenTelemetryCollector` to
+`ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector-contrib`.
+
+## Storage that survives a restart
+
+Jaeger keeps the traces of this tutorial in memory. For anything longer than
+a demo:
+
+- Jaeger with [OpenSearch, Elasticsearch, Cassandra or ClickHouse](https://www.jaegertracing.io/docs/latest/storage/).
+- [Grafana Tempo](https://grafana.com/oss/tempo/), installed with the
+  [Tempo operator](https://github.com/grafana/tempo-operator). Kiali reads
+  traces from Tempo too: set `provider: tempo` in the Kiali CR.
+
+## Documentation
+
+<CardGrid>
+  <LinkCard title="Kiali features" href="https://kiali.io/docs/features/" description="Everything the console does: topology, health, validations, wizards, tracing." />
+  <LinkCard title="Istio observability" href="https://istio.io/latest/docs/tasks/observability/" description="Metrics, logs and distributed tracing in the mesh and the Telemetry API." />
+  <LinkCard title="OpenTelemetry operator" href="https://opentelemetry.io/docs/platforms/kubernetes/operator/" description="Collectors and auto-instrumentation as Kubernetes resources." />
+  <LinkCard title="Context propagation" href="https://opentelemetry.io/docs/concepts/context-propagation/" description="The concept behind steps 3 and 4, in one page." />
+</CardGrid>
+
+## Clean up
+
+```bash
+make clean
+```
+
+This deletes the kind cluster and the `bin/` directory with `kind` and `istioctl`. The
+image of the demo stays in Docker: `docker image rm kiali-tracing-tutorial/mesh-pizza:latest`.

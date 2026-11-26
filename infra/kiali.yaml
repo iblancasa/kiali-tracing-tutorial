@@ -1,3 +1,9 @@
+# Kiali, managed by the Kiali operator. Anonymous access, because this is a
+# laptop. Kiali reads metrics from Prometheus and traces from Jaeger, and
+# links to Grafana and to the Jaeger UI.
+#
+# internal_url is what the Kiali pod uses. external_url is what your browser
+# uses when Kiali shows a link.
 apiVersion: kiali.io/v1alpha1
 kind: Kiali
 metadata:
@@ -6,9 +12,21 @@ metadata:
 spec:
   auth:
     strategy: anonymous
+  deployment:
+    cluster_wide_access: true
+    service_type: NodePort
+  server:
+    node_port: 30001
   external_services:
+    prometheus:
+      url: http://prometheus.istio-system.svc.cluster.local:9090
+    grafana:
+      enabled: true
+      internal_url: http://grafana.istio-system.svc.cluster.local:3000
+      external_url: http://localhost:3000
     tracing:
       enabled: true
-      in_cluster_url: "http://jaeger-query.istio-system.svc.cluster.local:16685"
+      provider: jaeger
       use_grpc: true
-      url: "http://jaeger-query.istio-system.svc.cluster.local:16686"
+      internal_url: http://jaeger.istio-system.svc.cluster.local:16685
+      external_url: http://localhost:16686

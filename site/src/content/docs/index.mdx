@@ -1,0 +1,73 @@
+---
+title: Kiali and distributed tracing
+description: Observe and troubleshoot applications in an Istio service mesh with Kiali, Jaeger, Prometheus, Grafana and OpenTelemetry. A hands-on tutorial on your laptop.
+template: splash
+hero:
+  tagline: The service mesh gives you metrics and traces without touching your code. The metrics are complete. The traces are in pieces. Find out why, and fix it twice.
+  actions:
+    - text: Prepare your laptop
+      link: /kiali-tracing-tutorial/prepare/
+      icon: right-arrow
+      variant: primary
+    - text: Start the tutorial
+      link: /kiali-tracing-tutorial/steps/01-infrastructure/
+      icon: rocket
+    - text: Repository
+      link: https://github.com/iblancasa/kiali-tracing-tutorial
+      icon: github
+      variant: minimal
+---
+
+import { Card, CardGrid, LinkCard } from '@astrojs/starlight/components';
+
+## What you will do
+
+<CardGrid stagger>
+  <Card title="Run a service mesh on kind" icon="laptop">
+    Istio, Kiali, Jaeger, Prometheus, Grafana and the OpenTelemetry Collector. The real tools, one `make` command.
+  </Card>
+  <Card title="Deploy a pizza shop" icon="rocket">
+    Mesh Pizza: fifteen workloads, two versions of one service, a Redis, one service that fails and one that is slow.
+  </Card>
+  <Card title="Troubleshoot it with Kiali" icon="magnifier">
+    Read the topology, find the failing edge and the slow one, jump from a workload to its metrics and its traces.
+  </Card>
+  <Card title="Repair the traces" icon="approve-check">
+    The mesh cannot join the spans of one request on its own. Fix it by hand in the code, then with OpenTelemetry auto-instrumentation and no code at all.
+  </Card>
+</CardGrid>
+
+## Before you arrive
+
+Do this at home, on real wifi. It takes 10 to 15 minutes and needs Docker, kind, kubectl and helm.
+
+```bash
+git clone https://github.com/iblancasa/kiali-tracing-tutorial.git
+cd kiali-tracing-tutorial
+make prepare
+```
+
+<LinkCard title="Full preparation guide" href="/kiali-tracing-tutorial/prepare/" description="Requirements, what make prepare installs and how to check it worked." />
+
+## The system
+
+```
+loadgen -> ingress gateway -> frontend -+-> menu -+-> pricing -> promotions
+                                        |         '-> reviews (v1, v2) -> ratings
+                                        |
+                                        '-> orders -+-> inventory -> redis
+                                                    +-> payments -> fraud
+                                                    +-> kitchen -> inventory
+                                                    +-> delivery -> maps
+                                                    '-> notifications
+```
+
+| What | Tool | Where |
+|---|---|---|
+| service mesh | [Istio](https://istio.io/) 1.32 | every pod of the shop has an Envoy sidecar |
+| mesh console | [Kiali](https://kiali.io/) 2.35 | [localhost:20001](http://localhost:20001) |
+| traces | [Jaeger](https://www.jaegertracing.io/) 2.23 | [localhost:16686](http://localhost:16686) |
+| metrics | [Prometheus](https://prometheus.io/) | [localhost:9090](http://localhost:9090) |
+| dashboards | [Grafana](https://grafana.com/oss/grafana/) | [localhost:3000](http://localhost:3000) |
+| telemetry pipeline | [OpenTelemetry Collector](https://opentelemetry.io/docs/collector/) | between the proxies and Jaeger |
+| auto-instrumentation | [OpenTelemetry operator](https://opentelemetry.io/docs/platforms/kubernetes/operator/) 0.164 | step 4 |

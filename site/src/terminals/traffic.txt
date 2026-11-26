@@ -1,0 +1,13 @@
+[1;32m$[0m kubectl -n loadgen logs deployment/loadgen --tail=8
+GET  /api/menu    -> 200 in 43 ms
+POST /api/orders  -> 502 in 125 ms
+POST /api/orders  -> 200 in 140 ms
+POST /api/orders  -> 200 in 154 ms
+GET  /api/menu    -> 200 in 50 ms
+POST /api/orders  -> 200 in 147 ms
+GET  /api/menu    -> 200 in 49 ms
+GET  /api/menu    -> 200 in 53 ms
+[1;32m$[0m make order
+{"eta_minutes":19,"order":"756848db"}
+
+-> HTTP 200 in 0.146477s

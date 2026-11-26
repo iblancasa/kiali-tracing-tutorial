@@ -1,0 +1,34 @@
+[1;32m$[0m make propagate 2>&1 | grep -v '^Waiting'
+kubectl --context kind-kiali-tracing -n demo set env deployment -l 'app!=redis' PROPAGATE_TRACE_HEADERS=true
+deployment.apps/delivery env updated
+deployment.apps/fraud env updated
+deployment.apps/frontend env updated
+deployment.apps/inventory env updated
+deployment.apps/kitchen env updated
+deployment.apps/maps env updated
+deployment.apps/menu env updated
+deployment.apps/notifications env updated
+deployment.apps/orders env updated
+deployment.apps/payments env updated
+deployment.apps/pricing env updated
+deployment.apps/promotions env updated
+deployment.apps/ratings env updated
+deployment.apps/reviews-v1 env updated
+deployment.apps/reviews-v2 env updated
+kubectl --context kind-kiali-tracing -n demo rollout status deployment --timeout=600s
+deployment "delivery" successfully rolled out
+deployment "fraud" successfully rolled out
+deployment "frontend" successfully rolled out
+deployment "inventory" successfully rolled out
+deployment "kitchen" successfully rolled out
+deployment "maps" successfully rolled out
+deployment "menu" successfully rolled out
+deployment "notifications" successfully rolled out
+deployment "orders" successfully rolled out
+deployment "payments" successfully rolled out
+deployment "pricing" successfully rolled out
+deployment "promotions" successfully rolled out
+deployment "ratings" successfully rolled out
+deployment "redis" successfully rolled out
+deployment "reviews-v1" successfully rolled out
+deployment "reviews-v2" successfully rolled out

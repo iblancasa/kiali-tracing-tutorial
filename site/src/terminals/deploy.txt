@@ -1,0 +1,89 @@
+[1;32m$[0m make deploy-apps 2>&1 | grep -v '^Waiting'
+kubectl --context kind-kiali-tracing apply -f apps/manifest.yaml
+namespace/demo created
+service/frontend created
+serviceaccount/frontend created
+deployment.apps/frontend created
+service/menu created
+serviceaccount/menu created
+deployment.apps/menu created
+service/pricing created
+serviceaccount/pricing created
+deployment.apps/pricing created
+service/promotions created
+serviceaccount/promotions created
+deployment.apps/promotions created
+service/reviews created
+serviceaccount/reviews created
+deployment.apps/reviews-v1 created
+deployment.apps/reviews-v2 created
+service/ratings created
+serviceaccount/ratings created
+deployment.apps/ratings created
+service/orders created
+serviceaccount/orders created
+deployment.apps/orders created
+service/inventory created
+serviceaccount/inventory created
+deployment.apps/inventory created
+service/payments created
+serviceaccount/payments created
+deployment.apps/payments created
+service/fraud created
+serviceaccount/fraud created
+deployment.apps/fraud created
+service/kitchen created
+serviceaccount/kitchen created
+deployment.apps/kitchen created
+service/delivery created
+serviceaccount/delivery created
+deployment.apps/delivery created
+service/maps created
+serviceaccount/maps created
+deployment.apps/maps created
+service/notifications created
+serviceaccount/notifications created
+deployment.apps/notifications created
+service/redis created
+deployment.apps/redis created
+gateway.networking.istio.io/demo-gateway created
+virtualservice.networking.istio.io/frontend created
+destinationrule.networking.istio.io/reviews created
+virtualservice.networking.istio.io/reviews created
+namespace/loadgen created
+deployment.apps/loadgen created
+kubectl --context kind-kiali-tracing -n demo rollout status deployment --timeout=600s
+deployment "delivery" successfully rolled out
+deployment "fraud" successfully rolled out
+deployment "frontend" successfully rolled out
+deployment "inventory" successfully rolled out
+deployment "kitchen" successfully rolled out
+deployment "maps" successfully rolled out
+deployment "menu" successfully rolled out
+deployment "notifications" successfully rolled out
+deployment "orders" successfully rolled out
+deployment "payments" successfully rolled out
+deployment "pricing" successfully rolled out
+deployment "promotions" successfully rolled out
+deployment "ratings" successfully rolled out
+deployment "redis" successfully rolled out
+deployment "reviews-v1" successfully rolled out
+deployment "reviews-v2" successfully rolled out
+[1;32m$[0m kubectl get pods -n demo
+NAME                             READY   STATUS    RESTARTS   AGE
+delivery-68fd78dfbc-xnd2t        2/2     Running   0          5s
+fraud-57f5c658f-cf5wc            2/2     Running   0          6s
+frontend-6c7cb787b7-lrw8q        2/2     Running   0          7s
+inventory-5b9ffffc79-vvfcf       2/2     Running   0          6s
+kitchen-6b49599799-msbzv         2/2     Running   0          6s
+maps-679d8b4fd9-g9dfw            2/2     Running   0          5s
+menu-84ffbdd5b8-25cnh            2/2     Running   0          7s
+notifications-76fc4995ff-s4j9p   2/2     Running   0          6s
+orders-65d8dbbbc8-n72f2          2/2     Running   0          6s
+payments-7c9547bbb9-pzzfs        2/2     Running   0          6s
+pricing-599f954bdf-7n7fq         2/2     Running   0          7s
+promotions-5fc8f96ff7-bk7d7      2/2     Running   0          7s
+ratings-d6b47fb49-k4m2k          2/2     Running   0          6s
+redis-569565456-wqwvl            2/2     Running   0          5s
+reviews-v1-844544667b-nfx59      2/2     Running   0          7s
+reviews-v2-77dfdc5555-2xsb2      2/2     Running   0          7s

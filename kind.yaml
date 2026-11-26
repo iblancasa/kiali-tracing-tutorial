@@ -1,18 +1,28 @@
+# kind cluster for the tutorial. One node, five host ports:
+#   8080  -> Istio ingress gateway  (NodePort 30080)  the demo applications
+#   20001 -> Kiali                  (NodePort 30001)
+#   16686 -> Jaeger UI              (NodePort 30686)
+#   3000  -> Grafana                (NodePort 30000)
+#   9090  -> Prometheus             (NodePort 30090)
 kind: Cluster
 apiVersion: kind.x-k8s.io/v1alpha4
+name: kiali-tracing
 nodes:
   - role: control-plane
-    image: kindest/node:v1.29.0@sha256:eaa1450915475849a73a9227b8f201df25e55e268e5d619312131292e324d570
-    kubeadmConfigPatches:
-      - |
-        kind: InitConfiguration
-        nodeRegistration:
-          kubeletExtraArgs:
-            node-labels: "ingress-ready=true"
+    image: kindest/node:v1.37.0@sha256:a1ed56cfb0e7b93589bdf97c8cd566405a265939e3620fc4f5de89adff580ae5
     extraPortMappings:
-      - containerPort: 80
-        hostPort: 80
+      - containerPort: 30080
+        hostPort: 8080
         protocol: TCP
-      - containerPort: 443
-        hostPort: 443
+      - containerPort: 30001
+        hostPort: 20001
+        protocol: TCP
+      - containerPort: 30686
+        hostPort: 16686
+        protocol: TCP
+      - containerPort: 30000
+        hostPort: 3000
+        protocol: TCP
+      - containerPort: 30090
+        hostPort: 9090
         protocol: TCP

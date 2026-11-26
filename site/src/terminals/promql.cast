@@ -1,0 +1,4 @@
+{"version":2,"width":120,"height":24,"timestamp":1795709866,"idle_time_limit":2.0,"command":"bash /var/folders/jb/hkvkhg2n2v5cvc5gc0vmf2000000gp/T/tmp.K1bjjBggs6","env":{"SHELL":"/bin/zsh"}}
+[0.017611, "o", "\u001b[1;32m$\u001b[0m curl -s localhost:9090/api/v1/query --data-urlencode 'query=sum by (destination_workload, response_code) (rate(istio_requests_total{reporter=\"destination\", destination_workload_namespace=\"demo\", response_code=~\"5..\"}[2m])) > 0' | jq -r '.data.result[] | \"\\(.metric.destination_workload)\\tHTTP \\(.metric.response_code)\\t\\(.value[1] | tonumber * 100 | round / 100) req/s\"'\r\n"]
+[0.027197, "o", "orders\tHTTP 502\t0.12 req/s\r\npayments\tHTTP 503\t0.13 req/s\r\nfrontend\tHTTP 502\t0.13 req/s\r\n"]
+[0.840621, "x", "0"]

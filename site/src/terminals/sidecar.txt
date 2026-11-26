@@ -1,0 +1,4 @@
+[1;32m$[0m kubectl -n demo get pod -l app=orders -o jsonpath='{range .items[0].spec.initContainers[*]}{.name}{"\n"}{end}{range .items[0].spec.containers[*]}{.name}{"\n"}{end}'
+istio-init
+istio-proxy
+orders

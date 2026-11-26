@@ -1,3 +1,6 @@
+# Auto-instrumentation settings for the demo namespace. The OpenTelemetry
+# operator injects them into every pod annotated with
+#   instrumentation.opentelemetry.io/inject-python: "true"
 apiVersion: opentelemetry.io/v1alpha1
 kind: Instrumentation
 metadata:
@@ -5,15 +8,28 @@ metadata:
   namespace: demo
 spec:
   exporter:
-    # Python autoinstrumentation uses http/proto by default
-    # so data must be sent to 4318 instead of 4317.
-    endpoint: http://instance-collector.istio-system.svc.cluster.local:4318
+    # Python auto-instrumentation speaks OTLP over HTTP (http/protobuf),
+    # so the endpoint is the Collector's 4318 port, not 4317.
+    endpoint: http://otel-collector.istio-system.svc.cluster.local:4318
+  # The Envoy proxies propagate context with the W3C traceparent header
+  # (infra/istio.yaml uses the OpenTelemetry provider), so the applications
+  # must speak the same format. With the Zipkin provider this would be b3multi.
   propagators:
     - tracecontext
     - baggage
-    - b3multi
   sampler:
     type: parentbased_traceidratio
     argument: "1"
-  resource:
-    addK8sUIDAttributes: true
+  python:
+    env:
+      # This tutorial is about traces, and the Collector only has a traces
+      # pipeline. Without these two the SDK would also export metrics and
+      # logs, and log a 404 every few seconds.
+      - name: OTEL_METRICS_EXPORTER
+        value: none
+      - name: OTEL_LOGS_EXPORTER
+        value: none
+      # The kubelet calls /healthz on every pod every few seconds. Nobody
+      # wants a trace for each of those.
+      - name: OTEL_PYTHON_EXCLUDED_URLS
+        value: healthz

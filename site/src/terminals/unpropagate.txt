@@ -1,0 +1,5 @@
+[1;32m$[0m make unpropagate 2>&1 | grep -v '^Waiting' | tail -4
+deployment "ratings" successfully rolled out
+deployment "redis" successfully rolled out
+deployment "reviews-v1" successfully rolled out
+deployment "reviews-v2" successfully rolled out

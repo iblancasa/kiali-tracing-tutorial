@@ -1,0 +1,53 @@
+[1;32m$[0m scripts/traces.py --minutes 1 --lines 5 --show 1
+TRACE      SPANS SERVICES ERRORS   DURATION  ROOT
+3d8ea9ad      42       19      0    1641 ms  istio-ingressgateway.istio-system: frontend.demo.svc.cluster.local:8080/*
+34be2861      42       19      0     158 ms  istio-ingressgateway.istio-system: frontend.demo.svc.cluster.local:8080/*
+e79c94a1      20       11      0      39 ms  istio-ingressgateway.istio-system: frontend.demo.svc.cluster.local:8080/*
+e3da7c9e      20       11      0      37 ms  istio-ingressgateway.istio-system: frontend.demo.svc.cluster.local:8080/*
+2c6b2033      42       19      0     165 ms  istio-ingressgateway.istio-system: frontend.demo.svc.cluster.local:8080/*
+
+110 traces of istio-ingressgateway.istio-system in the last 1 min. Spans per trace: min 20, median 24, max 42.
+
+trace 3d8ea9ad957139df26b3ce9fe393f384
+  istio-ingressgateway.istio-system     1640.5 ms  frontend.demo.svc.cluster.local:8080/*
+    istio-ingressgateway.istio-system   1640.1 ms  router outbound|8080||frontend.demo.svc.cluster.local; egres
+      frontend.demo                     1639.6 ms  frontend.demo.svc.cluster.local:8080/*
+        frontend                        1638.3 ms  POST /api/orders
+          frontend                      1634.2 ms  POST
+            frontend.demo               1632.9 ms  orders.demo.svc.cluster.local:8080/*
+              orders.demo               1632.4 ms  orders.demo.svc.cluster.local:8080/*
+                orders                  1631.7 ms  POST /orders
+                  orders                   5.9 ms  POST
+                    orders.demo            4.9 ms  inventory.demo.svc.cluster.local:8080/*
+                      inventory.demo       4.5 ms  inventory.demo.svc.cluster.local:8080/*
+                        inventory          3.9 ms  POST /reserve
+                          inventory        0.5 ms  SETNX
+                          inventory        0.4 ms  DECRBY
+                  orders                  99.5 ms  POST
+                    orders.demo           98.3 ms  payments.demo.svc.cluster.local:8080/*
+                      payments.demo       97.8 ms  payments.demo.svc.cluster.local:8080/*
+                        payments          97.2 ms  POST /charge
+                          payments        30.1 ms  POST
+                            payments.demo    28.9 ms  fraud.demo.svc.cluster.local:8080/*
+                              fraud.demo    28.4 ms  fraud.demo.svc.cluster.local:8080/*
+                                fraud     27.8 ms  POST /check
+                  orders                  19.9 ms  POST
+                    orders.demo           18.6 ms  kitchen.demo.svc.cluster.local:8080/*
+                      kitchen.demo        18.2 ms  kitchen.demo.svc.cluster.local:8080/*
+                        kitchen           17.5 ms  POST /tickets
+                          kitchen          6.5 ms  GET
+                            kitchen.demo     5.2 ms  inventory.demo.svc.cluster.local:8080/*
+                              inventory.demo     4.7 ms  inventory.demo.svc.cluster.local:8080/*
+                                inventory     4.0 ms  GET /ingredients/<pizza>
+                  orders                1488.4 ms  POST
+                    orders.demo         1487.1 ms  delivery.demo.svc.cluster.local:8080/*
+                      delivery.demo     1486.6 ms  delivery.demo.svc.cluster.local:8080/*
+                        delivery        1486.0 ms  POST /deliveries
+                          delivery      1477.9 ms  GET
+                            delivery.demo  1476.5 ms  maps.demo.svc.cluster.local:8080/*
+                              maps.demo  1476.0 ms  maps.demo.svc.cluster.local:8080/*
+                                maps    1475.2 ms  GET /route
+                  orders                  10.4 ms  POST
+                    orders.demo            8.9 ms  notifications.demo.svc.cluster.local:8080/*
+                      notifications.demo     8.3 ms  notifications.demo.svc.cluster.local:8080/*
+                        notifications      7.5 ms  POST /notify

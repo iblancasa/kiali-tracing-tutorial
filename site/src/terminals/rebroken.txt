@@ -1,0 +1,7 @@
+[1;32m$[0m scripts/traces.py --minutes 1 --lines 3
+TRACE      SPANS SERVICES ERRORS   DURATION  ROOT
+d73d1cd8       3        2      0     148 ms  istio-ingressgateway.istio-system: frontend.demo.svc.cluster.local:8080/*
+bf45d578       3        2      0      49 ms  istio-ingressgateway.istio-system: frontend.demo.svc.cluster.local:8080/*
+28dbacfd       3        2      0      44 ms  istio-ingressgateway.istio-system: frontend.demo.svc.cluster.local:8080/*
+
+111 traces of istio-ingressgateway.istio-system in the last 1 min. Spans per trace: min 3, median 3, max 3.

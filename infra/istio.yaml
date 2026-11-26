@@ -1,0 +1,50 @@
+# Istio installation, applied with `istioctl install -f infra/istio.yaml`.
+#
+# Two things differ from a default install:
+#   - the mesh knows a tracing backend: an OpenTelemetry extension provider
+#     that points at the OpenTelemetry Collector (infra/otelcol.yaml).
+#     infra/telemetry.yaml turns it on for every proxy.
+#   - the ingress gateway is a NodePort service on 30080, which kind maps to
+#     localhost:8080 (see kind.yaml).
+apiVersion: install.istio.io/v1alpha1
+kind: IstioOperator
+metadata:
+  name: tutorial
+  namespace: istio-system
+spec:
+  profile: default
+  meshConfig:
+    enableTracing: true
+    extensionProviders:
+      - name: otel
+        opentelemetry:
+          service: otel-collector.istio-system.svc.cluster.local
+          port: 4317
+  components:
+    pilot:
+      k8s:
+        resources:
+          requests:
+            cpu: 100m
+            memory: 256Mi
+    ingressGateways:
+      - name: istio-ingressgateway
+        enabled: true
+        k8s:
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+          service:
+            type: NodePort
+            ports:
+              - name: status-port
+                port: 15021
+                targetPort: 15021
+              - name: http2
+                port: 80
+                targetPort: 8080
+                nodePort: 30080
+              - name: https
+                port: 443
+                targetPort: 8443

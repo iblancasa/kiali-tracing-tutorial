@@ -1,0 +1,4 @@
+{"version":2,"width":120,"height":24,"timestamp":1795709584,"idle_time_limit":2.0,"command":"bash /var/folders/jb/hkvkhg2n2v5cvc5gc0vmf2000000gp/T/tmp.HkHSWggAQ9","env":{"SHELL":"/bin/zsh"}}
+[0.01523, "o", "\u001b[1;32m$\u001b[0m make unpropagate 2>&1 | grep -v '^Waiting' | tail -4\r\n"]
+[7.305636, "o", "deployment \"ratings\" successfully rolled out\r\ndeployment \"redis\" successfully rolled out\r\ndeployment \"reviews-v1\" successfully rolled out\r\ndeployment \"reviews-v2\" successfully rolled out\r\n"]
+[8.109993, "x", "0"]

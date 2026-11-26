@@ -1,0 +1,4 @@
+[1;32m$[0m curl -s localhost:9090/api/v1/query --data-urlencode 'query=sum by (destination_workload, response_code) (rate(istio_requests_total{reporter="destination", destination_workload_namespace="demo", response_code=~"5.."}[2m])) > 0' | jq -r '.data.result[] | "\(.metric.destination_workload)\tHTTP \(.metric.response_code)\t\(.value[1] | tonumber * 100 | round / 100) req/s"'
+orders	HTTP 502	0.12 req/s
+payments	HTTP 503	0.13 req/s
+frontend	HTTP 502	0.13 req/s

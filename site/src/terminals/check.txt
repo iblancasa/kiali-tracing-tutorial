@@ -1,0 +1,9 @@
+[1;32m$[0m make check
+Checking tools...
+  [ok]   docker   29.5.2
+  [ok]   kubectl  Client Version: v1.37.2
+  [ok]   helm     v4.3.1+gc0d08d0
+  [ok]   curl     curl 8.7.1 (x86_64-apple-darwin25.0) libcurl/8.7.1 (SecureTransport) LibreSSL/3.3.6 zlib/1.2.12 nghttp2/1.68.1
+  [ok]   kind     kind v0.33.0
+  [ok]   cluster  kind cluster kiali-tracing already exists
+All good.

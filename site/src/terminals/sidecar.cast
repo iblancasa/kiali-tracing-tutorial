@@ -1,0 +1,4 @@
+{"version":2,"width":120,"height":24,"timestamp":1795709497,"idle_time_limit":2.0,"command":"bash /var/folders/jb/hkvkhg2n2v5cvc5gc0vmf2000000gp/T/tmp.KfsDFz5ZCb","env":{"SHELL":"/bin/zsh"}}
+[0.014105, "o", "\u001b[1;32m$\u001b[0m kubectl -n demo get pod -l app=orders -o jsonpath='{range .items[0].spec.initContainers[*]}{.name}{\"\\n\"}{end}{range .items[0].spec.containers[*]}{.name}{\"\\n\"}{end}'\r\n"]
+[0.049767, "o", "istio-init\r\nistio-proxy\r\norders\r\n"]
+[0.862801, "x", "0"]

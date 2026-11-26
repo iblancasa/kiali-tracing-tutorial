@@ -1,0 +1,6 @@
+{"version":2,"width":120,"height":24,"timestamp":1795709777,"idle_time_limit":2.0,"command":"bash /var/folders/jb/hkvkhg2n2v5cvc5gc0vmf2000000gp/T/tmp.m1jpI9cZPD","env":{"SHELL":"/bin/zsh"}}
+[0.016686, "o", "\u001b[1;32m$\u001b[0m kubectl -n demo get pod -l app=orders -o jsonpath='{range .items[0].spec.initContainers[*]}{.name}{\"\\n\"}{end}'\r\n"]
+[0.055577, "o", "istio-init\r\nistio-proxy\r\nopentelemetry-auto-instrumentation-python\r\n"]
+[0.866279, "o", "\u001b[1;32m$\u001b[0m kubectl -n demo get pod -l app=orders -o jsonpath='{range .items[0].spec.containers[0].env[*]}{.name}={.value}{\"\\n\"}{end}' | grep -E 'PYTHONPATH|OTEL_(SERVICE_NAME|TRACES_EXPORTER|EXPORTER_OTLP|PROPAGATORS|PYTHON)'\r\n"]
+[0.919035, "o", "OTEL_PYTHON_EXCLUDED_URLS=healthz\r\nPYTHONPATH=/otel-auto-instrumentation-python/opentelemetry/instrumentation/auto_instrumentation:/otel-auto-instrumentation-python\r\nOTEL_EXPORTER_OTLP_PROTOCOL=http/protobuf\r\nOTEL_TRACES_EXPORTER=otlp\r\nOTEL_SERVICE_NAME=orders\r\nOTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector.istio-system.svc.cluster.local:4318\r\nOTEL_PROPAGATORS=tracecontext,baggage\r\n"]
+[1.73498, "x", "0"]

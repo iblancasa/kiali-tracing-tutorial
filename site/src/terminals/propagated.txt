@@ -1,0 +1,32 @@
+[1;32m$[0m scripts/traces.py --minutes 1 --lines 5 --show 1
+TRACE      SPANS SERVICES ERRORS   DURATION  ROOT
+64da9563      21       10      0    1641 ms  istio-ingressgateway.istio-system: frontend.demo.svc.cluster.local:8080/*
+dcb25453      11        6      0      47 ms  istio-ingressgateway.istio-system: frontend.demo.svc.cluster.local:8080/*
+97610c78      11        6      0      34 ms  istio-ingressgateway.istio-system: frontend.demo.svc.cluster.local:8080/*
+5afb0f6f      11        6      0      49 ms  istio-ingressgateway.istio-system: frontend.demo.svc.cluster.local:8080/*
+f8c82fe0      11        6      0      44 ms  istio-ingressgateway.istio-system: frontend.demo.svc.cluster.local:8080/*
+
+92 traces of istio-ingressgateway.istio-system in the last 1 min. Spans per trace: min 11, median 13, max 21.
+
+trace 64da9563d2101b525d8e6c1c321e7219
+  istio-ingressgateway.istio-system     1641.1 ms  frontend.demo.svc.cluster.local:8080/*
+    istio-ingressgateway.istio-system   1640.8 ms  router outbound|8080||frontend.demo.svc.cluster.local; egres
+      frontend.demo                     1640.2 ms  frontend.demo.svc.cluster.local:8080/*
+        frontend.demo                   1629.5 ms  orders.demo.svc.cluster.local:8080/*
+          orders.demo                   1628.8 ms  orders.demo.svc.cluster.local:8080/*
+            orders.demo                    6.7 ms  inventory.demo.svc.cluster.local:8080/*
+              inventory.demo               6.2 ms  inventory.demo.svc.cluster.local:8080/*
+            orders.demo                   89.0 ms  payments.demo.svc.cluster.local:8080/*
+              payments.demo               88.5 ms  payments.demo.svc.cluster.local:8080/*
+                payments.demo             22.8 ms  fraud.demo.svc.cluster.local:8080/*
+                  fraud.demo              22.4 ms  fraud.demo.svc.cluster.local:8080/*
+            orders.demo                   17.8 ms  kitchen.demo.svc.cluster.local:8080/*
+              kitchen.demo                17.4 ms  kitchen.demo.svc.cluster.local:8080/*
+                kitchen.demo               4.7 ms  inventory.demo.svc.cluster.local:8080/*
+                  inventory.demo           4.3 ms  inventory.demo.svc.cluster.local:8080/*
+            orders.demo                 1491.5 ms  delivery.demo.svc.cluster.local:8080/*
+              delivery.demo             1490.7 ms  delivery.demo.svc.cluster.local:8080/*
+                delivery.demo           1482.0 ms  maps.demo.svc.cluster.local:8080/*
+                  maps.demo             1480.9 ms  maps.demo.svc.cluster.local:8080/*
+            orders.demo                    7.4 ms  notifications.demo.svc.cluster.local:8080/*
+              notifications.demo           6.6 ms  notifications.demo.svc.cluster.local:8080/*

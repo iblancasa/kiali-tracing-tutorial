@@ -1,0 +1,74 @@
+---
+title: Start here
+description: What the tutorial is about, how the session goes and how to read these pages.
+---
+
+import { Steps, Aside } from '@astrojs/starlight/components';
+
+A service mesh puts a proxy next to every application. The proxy sees every
+request, so it can report metrics and trace spans for applications that
+were never instrumented. Kiali turns that telemetry into a live map of your
+system.
+
+There is one thing the proxy cannot do: know that the request leaving your
+application belongs to the request that entered it a few milliseconds
+before. Without that, every hop becomes its own trace. In this tutorial you
+see the problem, understand it and fix it in two different ways.
+
+Everything runs on your laptop in a [kind](https://kind.sigs.k8s.io/)
+cluster. Nothing leaves your machine.
+
+## How the session goes
+
+<Steps>
+
+1. **At home, before the event.** [Prepare your laptop](/kiali-tracing-tutorial/prepare/).
+   `make prepare` creates the cluster and installs everything. Ten to
+   fifteen minutes on good wifi.
+
+2. **Hands-on.** Five short steps, left sidebar. Each page says what to
+   run, what you should see and why it matters.
+
+</Steps>
+
+## The steps
+
+| Step | What you do | Where |
+|------|-------------|-------|
+| [1. Infrastructure](/kiali-tracing-tutorial/steps/01-infrastructure/) | Understand what `make prepare` installed and how telemetry flows | kubectl |
+| [2. Deploying workloads](/kiali-tracing-tutorial/steps/02-deploying-workloads/) | Deploy Mesh Pizza, read its topology, find the failing service and the slow one | Kiali, Grafana, Prometheus |
+| [3. Tracing is broken](/kiali-tracing-tutorial/steps/03-tracing-is-broken/) | See why the traces are in pieces, fix it by forwarding headers in the code | Jaeger, Kiali |
+| [4. Auto-instrumentation](/kiali-tracing-tutorial/steps/04-auto-instrumentation/) | Get the same result, and more spans, without code | Jaeger, Kiali |
+| [5. Next steps](/kiali-tracing-tutorial/steps/05-next-steps/) | Things to try on the cluster you have | |
+
+## Reading these pages
+
+Commands you type look like this:
+
+```bash
+make deploy-apps
+```
+
+Every `make` target is a thin wrapper around `kubectl`, `helm` or
+`istioctl`. The pages show the real command next to it, and
+[Commands](/kiali-tracing-tutorial/reference/commands/) lists them all.
+
+Terminal windows show the real output of each command, captured on the
+author's laptop. They play once when they scroll into view and then stay,
+so you can read them at your own pace. Your pod names and numbers will
+differ.
+
+<Aside type="tip" title="Tabs to keep open">
+Kiali: [localhost:20001](http://localhost:20001). Jaeger:
+[localhost:16686](http://localhost:16686). Grafana:
+[localhost:3000](http://localhost:3000). Prometheus:
+[localhost:9090](http://localhost:9090). All four work once `make prepare`
+finishes. The shop, [localhost:8080](http://localhost:8080), works from
+step 2.
+</Aside>
+
+<Aside type="note" title="Time ranges">
+Kiali shows the last minute by default, Jaeger searches the last hour,
+Grafana dashboards the last 5 to 30 minutes. When a view looks empty, check
+its time picker before anything else.
+</Aside>

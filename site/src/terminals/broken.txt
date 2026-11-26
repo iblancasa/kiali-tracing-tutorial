@@ -1,0 +1,22 @@
+[1;32m$[0m scripts/traces.py --lines 5
+TRACE      SPANS SERVICES ERRORS   DURATION  ROOT
+c42ea03c       3        2      0    1428 ms  istio-ingressgateway.istio-system: frontend.demo.svc.cluster.local:8080/*
+0b19b798       3        2      0     137 ms  istio-ingressgateway.istio-system: frontend.demo.svc.cluster.local:8080/*
+3c9aa869       3        2      0     188 ms  istio-ingressgateway.istio-system: frontend.demo.svc.cluster.local:8080/*
+57f51723       3        2      0    1571 ms  istio-ingressgateway.istio-system: frontend.demo.svc.cluster.local:8080/*
+174100a5       3        2      3      81 ms  istio-ingressgateway.istio-system: frontend.demo.svc.cluster.local:8080/*
+
+174 traces of istio-ingressgateway.istio-system in the last 2 min. Spans per trace: min 1, median 3, max 3.
+[1;32m$[0m scripts/traces.py orders.demo --lines 5 --show 1
+TRACE      SPANS SERVICES ERRORS   DURATION  ROOT
+89ea3033       2        2      0      88 ms  orders.demo: payments.demo.svc.cluster.local:8080/*
+a11a8ce9       2        2      0       3 ms  orders.demo: inventory.demo.svc.cluster.local:8080/*
+ac07fd69       2        2      0    1530 ms  frontend.demo: orders.demo.svc.cluster.local:8080/*
+c02ae8ed       2        2      0       5 ms  orders.demo: notifications.demo.svc.cluster.local:8080/*
+443a7ca1       2        2      0    1301 ms  orders.demo: delivery.demo.svc.cluster.local:8080/*
+
+200 traces of orders.demo in the last 2 min. Spans per trace: min 2, median 2, max 2.
+
+trace 89ea3033afc82960010d9ee44a20af41
+  orders.demo                             87.9 ms  payments.demo.svc.cluster.local:8080/*
+    payments.demo                         87.6 ms  payments.demo.svc.cluster.local:8080/*

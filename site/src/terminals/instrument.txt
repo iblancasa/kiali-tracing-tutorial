@@ -1,0 +1,37 @@
+[1;32m$[0m make instrument 2>&1 | grep -v '^Waiting'
+kubectl --context kind-kiali-tracing apply -f infra/instrumentation.yaml
+instrumentation.opentelemetry.io/python created
+kubectl --context kind-kiali-tracing -n demo patch $(kubectl --context kind-kiali-tracing -n demo get deployment -l 'app!=redis' -o name) --type merge \
+		-p '{"spec":{"template":{"metadata":{"annotations":{"instrumentation.opentelemetry.io/inject-python":"true","traffic.sidecar.istio.io/excludeOutboundPorts":"4318"}}}}}'
+deployment.apps/delivery patched
+deployment.apps/fraud patched
+deployment.apps/frontend patched
+deployment.apps/inventory patched
+deployment.apps/kitchen patched
+deployment.apps/maps patched
+deployment.apps/menu patched
+deployment.apps/notifications patched
+deployment.apps/orders patched
+deployment.apps/payments patched
+deployment.apps/pricing patched
+deployment.apps/promotions patched
+deployment.apps/ratings patched
+deployment.apps/reviews-v1 patched
+deployment.apps/reviews-v2 patched
+kubectl --context kind-kiali-tracing -n demo rollout status deployment --timeout=600s
+deployment "delivery" successfully rolled out
+deployment "fraud" successfully rolled out
+deployment "frontend" successfully rolled out
+deployment "inventory" successfully rolled out
+deployment "kitchen" successfully rolled out
+deployment "maps" successfully rolled out
+deployment "menu" successfully rolled out
+deployment "notifications" successfully rolled out
+deployment "orders" successfully rolled out
+deployment "payments" successfully rolled out
+deployment "pricing" successfully rolled out
+deployment "promotions" successfully rolled out
+deployment "ratings" successfully rolled out
+deployment "redis" successfully rolled out
+deployment "reviews-v1" successfully rolled out
+deployment "reviews-v2" successfully rolled out
